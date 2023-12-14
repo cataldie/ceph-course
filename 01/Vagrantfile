@@ -70,7 +70,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 ##################################### Configuration for ceph-node1T #####################################################
 
                  config.vm.define :"ceph-node1T" do |node1|
-                        node1.vm.box = "yuenfaytsang/centos7"
+                        node1.vm.box = "sondahl/centos7-2009"
                         node1.vm.network :private_network, ip: "192.168.56.101"
                         node1.vm.hostname = ceph_node1
                         node1.vm.synced_folder ".", "/vagrant", disabled: true
