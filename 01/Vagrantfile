@@ -92,10 +92,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                                 v.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', ceph_node1_disk3]
                                 end
 
-                                unless File.exist?(ceph_node1_disk4)
-                                v.customize ['createhd', '--filename', ceph_node1_disk4,'--size', 1 * 20480]
-                                v.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', 3, '--device', 0, '--type', 'hdd', '--medium', ceph_node1_disk4]
-                                end
+                                #unless File.exist?(ceph_node1_disk4)
+                                #v.customize ['createhd', '--filename', ceph_node1_disk4,'--size', 1 * 20480]
+                                #v.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', 3, '--device', 0, '--type', 'hdd', '--medium', ceph_node1_disk4]
+                                #end
 
                         end
 
