@@ -101,42 +101,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
                 end
 
-
-##################################### Configuration for ceph-node1 #####################################################
-
-                 config.vm.define :"ceph-node1" do |node1|
-                        node1.vm.box = BOX
-                        node1.vm.box_url = BOX_URL
-                        node1.vm.network :private_network, ip: "192.168.1.101"
-                        node1.vm.hostname = ceph_node1
-                        node1.vm.synced_folder ".", "/vagrant", disabled: true
-			node1.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-                        node1.vm.provision "shell", path: "post-deploy.sh" ,run: "always"
-                        node1.vm.provider "virtualbox" do |v|
-
-                                v.customize ["modifyvm", :id, "--memory", "1300"]
-                                v.name = ceph_node1
-				v.gui = true
-
-                                unless File.exist?(ceph_node1_disk2)
-                                v.customize ['createhd', '--filename', ceph_node1_disk2, '--size', 1 * 20480]
-                                v.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', ceph_node1_disk2]
-                                end
-
-                                unless File.exist?(ceph_node1_disk3)
-                                v.customize ['createhd', '--filename', ceph_node1_disk3,'--size', 1 * 20480]
-                                v.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', ceph_node1_disk3]
-                                end
-
-                                unless File.exist?(ceph_node1_disk4)
-                                v.customize ['createhd', '--filename', ceph_node1_disk4,'--size', 1 * 20480]
-                                v.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', 3, '--device', 0, '--type', 'hdd', '--medium', ceph_node1_disk4]
-                                end
-
-                        end
-
-                end
-
 ##################################### Configuration for ceph-node2 #####################################################
 
  		config.vm.define :"ceph-node2" do |node2|
