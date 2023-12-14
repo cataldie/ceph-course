@@ -67,9 +67,9 @@ oc_hostname= 'owncloud.cephcookbook.com'
 oc_name= 'owncloud'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-##################################### Configuration for ceph-node1T #####################################################
+##################################### Configuration for ceph-node1 #####################################################
 
-                 config.vm.define :"ceph-node1T" do |node1|
+                 config.vm.define :"ceph-node1" do |node1|
                         node1.vm.box = "sondahl/centos7-2009"
                         node1.vm.network :private_network, ip: "192.168.56.101"
                         node1.vm.hostname = ceph_node1
