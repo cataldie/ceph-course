@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
 end
 
 BOX='centos7-standard'
-BOX_URL='file://home/student/Downloads/centos7-standard.box'
+BOX_URL='https://www.dropbox.com/s/hiarmp3cdzjy94o/centos7-standard.box?dl=1'
 
 BOX_OPENSTACK='openstack'
 BOX_URL_OPENSTACK='https://www.dropbox.com/s/azww4ud3ti910os/openstack.box?dl=1'
