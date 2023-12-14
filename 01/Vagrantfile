@@ -70,17 +70,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 ##################################### Configuration for ceph-node1 #####################################################
 
                  config.vm.define :"ceph-node1" do |node1|
-                        node1.vm.box = "sondahl/centos7-2009"
+                        node2.vm.box = BOX
+                        node2.vm.box_url = BOX_URL
                         node1.vm.network :private_network, ip: "192.168.56.101"
                         node1.vm.hostname = ceph_node1
                         node1.vm.synced_folder ".", "/vagrant", disabled: true
-			node1.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+			                  node1.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
                         node1.vm.provision "shell", path: "post-deploy.sh" ,run: "always"
                         node1.vm.provider "virtualbox" do |v|
 
                                 v.customize ["modifyvm", :id, "--memory", "1300"]
                                 v.name = ceph_node1
-				v.gui = true
+				                        v.gui = true
 
                                 unless File.exist?(ceph_node1_disk2)
                                 v.customize ['createhd', '--filename', ceph_node1_disk2, '--size', 1 * 20480]
