@@ -71,7 +71,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
                  config.vm.define :"ceph-node1T" do |node1|
                         node1.vm.box = "centos/7"
-                        node1.vm.network :private_network, ip: "192.168.1.101"
+                        node1.vm.network :private_network, ip: "192.168.56.101"
                         node1.vm.hostname = ceph_node1
                         node1.vm.synced_folder ".", "/vagrant", disabled: true
 			node1.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
