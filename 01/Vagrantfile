@@ -109,7 +109,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  		config.vm.define :"ceph-node2" do |node2|
                         node2.vm.box = BOX
                         node2.vm.box_url = BOX_URL
-                        node2.vm.network :private_network, ip: "192.168.1.102"
+                        node2.vm.network :private_network, ip: "192.168.56.102"
                         node2.vm.hostname = ceph_node2
                         #node2.vm.synced_folder ".", "/vagrant", disabled: true
 			#node2.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
