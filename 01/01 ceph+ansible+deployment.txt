@@ -68,14 +68,11 @@ $ pip3 install wheel --user
 
 $export CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
-
 [cephuser@mon1 ceph-ansible]$  pip3 install --upgrade pip --user
-
-
 
 5-Use pip and the provided requirements.txt file in the ceph-ansible directory to install Ansible and the other necessary Python libraries:
 
-$pip3 install -r requirements.txt --user
+$ pip3 install -r requirements.txt --user
 
 $ echo "PATH=\$PATH:/usr/local/bin" >>~/.bashrc &&  source ~/.bashrc
 
