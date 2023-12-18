@@ -3,6 +3,7 @@ $ sudo apt install terminator
 $ sudo apt update
 $ sudo apt install git
 
+$ git clone https://github.com/cataldie/ceph-course.git
 
 #Check if Virtualization is enabled >0 
 
@@ -23,3 +24,5 @@ $ sudo systemctl status libvirtd
 
 $ sudo usermod -aG kvm $USER
 $ sudo usermod -aG libvirt $USER
+
+$ sudo reboot now
