@@ -30,3 +30,8 @@ $ sudo reboot now
 $ cd Downloads
 
 $ wget https://releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso
+
+
+#firewall
+$  sudo ufw allow 6789/tcp
+$  sudo ufw allow 6800:7100/tcp
