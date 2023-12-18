@@ -32,8 +32,8 @@ ceph_stable_release: pacific
 # Interface options
 monitor_interface: enp1s0
 radosgw_interface: enp1s0
-public_network: 192.168.121.0/24
-cluster_network: 192.168.121.0/24
+public_network: 192.168.122.0/24
+cluster_network: 192.168.122.0/24
 #DASHBOARD
 dashboard_enable: True
 dashboard_protocole: https
@@ -85,18 +85,12 @@ ceph-osd1
 [grafana-server]
 ceph-node1
 
-
 additionnal files to configure
 
-
 [vagrant@mon1 ceph-ansible]$ cp site.yml.sample site.yml
-[vagrant@mon1 ceph-ansible]$
-
 
 [vagrant@mon1 ceph-ansible]$  cp group_vars/osds.yml.sample group_vars/osds.yml
-[vagrant@mon1 ceph-ansible]$
- 
-$
+
 $ nano group_vars/osds.yml
 #---------------Option 1---------
 osd_auto_discovery: true

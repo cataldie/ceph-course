@@ -1,6 +1,5 @@
 D- After a successfulful install
 
-
 Check the cluster status
 [root@mon1 ~]#
 [root@mon1 ~]# ceph -s
@@ -23,16 +22,10 @@ Check the cluster status
     usage:   450 GiB used, 750 GiB / 1.2 TiB avail
     pgs:     193 active+clean
 
-[root@mon1 ~]#
 
-
-
-remove the warning with this command This one is about a security concern that has been raised before and the developer has give this command
+#remove the warning with this command This one is about a security concern that has been raised before and the developer has give this command
 
 [root@mon1 ~]# ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
-[root@mon1 ~]#
-
-
 
 [root@mon1 ~]# ceph -s
   cluster:
@@ -55,8 +48,6 @@ remove the warning with this command This one is about a security concern that h
 
 [root@mon1 ~]#
 
-
-
 --------------------      Shrink MON -----------
 ansible-playbook shrink-mon.yml -e mon_to_kill=<hostname> -u <ansible-user>
 
@@ -65,7 +56,6 @@ ansible-playbook -vv -i hosts infrastructure-playbooks/shrink-mon.yml -e mon_to_
 --------------------------------SHRINK OSD-------------------
 
 $ansible-playbook -vv -i hosts infrastructure-playbooks/shrink-osd.yml -e osd_to_kill=0,1,2
-
 
 ---------------------------
 sudo systemctl stop ceph-osd@<osd-id>
