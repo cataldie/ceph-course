@@ -1,5 +1,5 @@
 
-$ssh ceph-node2
+$ssh ceph-osd1
 $ lsblk
 #disk space
 df
@@ -10,10 +10,8 @@ B- Configure Ansible Inventory and Ansible Playbook for ceph
 a- The first node (mon1) will be used as the administration node for the installation.
 
 [cephuser@mon1 ceph-ansible]$  cp group_vars/all.yml.sample group_vars/all.yml
-[cephuser@mon1 ceph-ansible]$
 
 b-Configuring deployment files
-
 
 $nano group_vars/all.yml
 #General
@@ -59,12 +57,12 @@ $ nano ansible.cfg
 # Be sure the user running Ansible has permissions on the logfile
 log_path = $HOME/vagrant/ansible.log
 
+# append
 inventory=/home/vagrant/ceph-ansible/hosts
-
 
 $ nano hosts
 ceph-node1 ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
-ceph-node2 ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
+ceph-osd1 ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
 
 [monprimary]
 ceph-node1
@@ -82,7 +80,7 @@ ceph-node1
 ceph-node1
 # (Object Storage Daemon) Nodes
 [osds]
-ceph-node1
+ceph-osd1
 # Serveur Grafana
 [grafana-server]
 ceph-node1

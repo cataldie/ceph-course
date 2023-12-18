@@ -80,13 +80,11 @@ $ echo "PATH=\$PATH:/usr/local/bin" >>~/.bashrc &&  source ~/.bashrc
 6- Installing the ansible utils package for configuring network interfaces
 $ sudo apt install ansible
 
- ansible-galaxy collection install ansible.utils
+$ ansible-galaxy collection install ansible.utils
  
 7 - Passwordless configuration
 
 Set the SSH key pair on your Ceph deployment node (MON1) and copy the public key to all storage nodes.
-
-
 
 a-  ssh-keygen
 
