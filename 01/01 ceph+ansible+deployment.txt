@@ -9,6 +9,11 @@ sudo nano /etc/hosts
 
 192.168.121.151 ceph-client1
 
+192.168.122.101 ceph-node1
+192.168.122.111 ceph-osd1
+192.168.122.112 ceph-osd2
+192.168.121.151 ceph-client1
+
 
 #change hostname
 hostname
@@ -17,9 +22,7 @@ sudo nano /etc/hostname
 
 sudo reboot now
 
-#firewall
-sudo ufw allow 6789/tcp
-sudo ufw allow 6800:7100/tcp
+
 
 
 #libvirt setup machine ip by mac address
