@@ -95,18 +95,10 @@ a-  ssh-keygen
 
 $ ssh-keygen 
 
+$ ssh-copy-id vagrant@ceph-node1
+$ ssh-copy-id vagrant@ceph-osd1
+$ ssh-copy-id vagrant@ceph-osd2
+$ ssh-copy-id vagrant@ceph-client1
 
-$ssh-copy-id vagrant@ceph-node1
-$ssh-copy-id vagrant@ceph-node2
-
-$ssh-copy-id cephuser@osd2
-$ssh-copy-id cephuser@osd3
-$ssh-copy-id cephuser@mon1
-$ssh-copy-id cephuser@mon2
-$ssh-copy-id cephuser@mon3
-$ssh-copy-id cephuser@rgwiscsi1
-$ssh-copy-id cephuser@rgwiscsi2
-$ssh-copy-id ss@mdsgan1
-$ssh-copy-id cephuser@mdsgan2
 
 ---------------
