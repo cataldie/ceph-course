@@ -22,9 +22,6 @@ sudo nano /etc/hostname
 
 sudo reboot now
 
-
-
-
 #libvirt setup machine ip by mac address
 
 virsh  net-list
@@ -46,15 +43,6 @@ sudo systemctl stop libvirtd
 sudo systemctl start libvirtd
 
 
-2- REPOSITORY CONFIGURATION
-
-$ sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-$ sudo dnf -y config-manager --set-enabled powertools
-
-3- Git install
-
-[cephuser@mon1 ~]$ sudo dnf install git -y
-
 4- Clone ceph-ansible project:
 
 [cephuser@mon1 ~]$  git clone https://github.com/ceph/ceph-ansible.git
@@ -66,16 +54,7 @@ ceph-ansible
 
 Go to the ceph pacific branch.
 
-
-[cephuser@mon1 ~]$ cd ceph-ansible/
-[cephuser@mon1 ceph-ansible]$ git checkout $branch
-Votre branche est à jour avec 'origin/main'.
-[cephuser@mon1 ceph-ansible]$
-[cephuser@mon1 ceph-ansible]$
 [cephuser@mon1 ceph-ansible]$ git checkout stable-6.0
-la branche 'stable-6.0' est paramétrée pour suivre 'origin/stable-6.0'.
-Basculement sur la nouvelle branche 'stable-6.0'
-[cephuser@mon1 ceph-ansible]$
 
 4 - Install pip-python
 
