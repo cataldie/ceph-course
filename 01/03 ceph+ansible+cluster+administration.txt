@@ -1,0 +1,193 @@
+D- After a successfulful install
+
+
+Check the cluster status
+[root@mon1 ~]#
+[root@mon1 ~]# ceph -s
+  cluster:
+    id:     5bbc52ca-a956-40f4-9d62-48712dac037a
+    health: HEALTH_WARN
+            mon is allowing insecure global_id reclaim
+
+  services:
+    mon: 1 daemons, quorum mon1 (age 6m)
+    mgr: mon1(active, since 64s)
+    mds: 1/1 daemons up
+    osd: 15 osds: 15 up (since 4m), 15 in (since 4m)
+    rgw: 1 daemon active (1 hosts, 1 zones)
+
+  data:
+    volumes: 1/1 healthy
+    pools:   7 pools, 193 pgs
+    objects: 213 objects, 9.4 KiB
+    usage:   450 GiB used, 750 GiB / 1.2 TiB avail
+    pgs:     193 active+clean
+
+[root@mon1 ~]#
+
+
+
+remove the warning with this command This one is about a security concern that has been raised before and the developer has give this command
+
+[root@mon1 ~]# ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
+[root@mon1 ~]#
+
+
+
+[root@mon1 ~]# ceph -s
+  cluster:
+    id:     5bbc52ca-a956-40f4-9d62-48712dac037a
+    health: HEALTH_OK
+
+  services:
+    mon: 1 daemons, quorum mon1 (age 8m)
+    mgr: mon1(active, since 3m)
+    mds: 1/1 daemons up
+    osd: 15 osds: 15 up (since 6m), 15 in (since 6m)
+    rgw: 1 daemon active (1 hosts, 1 zones)
+
+  data:
+    volumes: 1/1 healthy
+    pools:   7 pools, 193 pgs
+    objects: 213 objects, 9.6 KiB
+    usage:   450 GiB used, 750 GiB / 1.2 TiB avail
+    pgs:     193 active+clean
+
+[root@mon1 ~]#
+
+
+
+--------------------      Shrink MON -----------
+ansible-playbook shrink-mon.yml -e mon_to_kill=<hostname> -u <ansible-user>
+
+ansible-playbook -vv -i hosts infrastructure-playbooks/shrink-mon.yml -e mon_to_kill=mon3
+
+--------------------------------SHRINK OSD-------------------
+
+$ansible-playbook -vv -i hosts infrastructure-playbooks/shrink-osd.yml -e osd_to_kill=0,1,2
+
+
+---------------------------
+sudo systemctl stop ceph-osd@<osd-id>
+ceph osd down <osd-id>
+ceph osd purge <osd-id> --yes-i-really-mean-it
+sudo lvremove /dev/ceph-<pool-name>/<logical-volume-name>
+
+-------
+
+----------------------------PURGE CLUSTER------------------------
+
+1- Purge dashboard componants
+$ ansible-playbook -vv -i hosts infrastructure-playbooks/purge-dashboard.yml
+
+2- Purge cluster.
+ansible-playbook -vv -i hosts infrastructure-playbooks/purge-cluster.yml
+
+
+this for non-contenarized installation.
+
+
+----------------------------CEPH CLUSTER CONTAINERIZED DEPLOYMENT-----------
+
+
+cp site-container.yml.sample site-container.yml
+
+
+Edit the file group_vars/all.yml and add containerized_deployment: true
+
+ansible-playbook -u cephuser site-container.yml -i hosts
+
+[cephuser@osd1 ~]$ lsblk
+NAME                                                                  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+......
+nvme0n1                                                               259:0    0   30G  0 disk
+└─ceph--13662d50--4353--45a3--825d--ab19ed0d0f3d-osd--db--a3c07ebf--195b--4b12--a304--34554315c1d1
+
+
+
+  sudo lvdisplay 
+  
+  --- Logical volume ---
+  LV Path                /dev/ceph-13662d50-4353-45a3-825d-ab19ed0d0f3d/osd-db-a3c07ebf-195b-4b12-a304-34554315c1d1
+  LV Name                osd-db-a3c07ebf-195b-4b12-a304-34554315c1d1
+  VG Name                ceph-13662d50-4353-45a3-825d-ab19ed0d0f3d
+  LV UUID                6tZ4Qm-8fFe-byvx-UGnl-Fzj9-z2CW-XBYlpg
+  LV Write Access        read/write
+  LV Creation host, time osd1.ceph.example.com, 2023-07-02 11:53:11 -0400
+  
+  
+
+1-[cephuser@osd1 ~]$  sudo lvremove /dev/ceph-13662d50-4353-45a3-825d-ab19ed0d0f3d/osd-db-a3c07ebf-195b-4b12-a304-34554315c1d1
+Do you really want to remove active logical volume ceph-13662d50-4353-45a3-825d-ab19ed0d0f3d/osd-db-a3c07ebf-195b-4b12-a304-34554315c1d1? [y/n]: y
+  Logical volume "osd-db-a3c07ebf-195b-4b12-a304-34554315c1d1" successfully removed.
+[cephuser@osd1 ~]$
+
+
+
+2-sudo pvremove /dev/nvme0n1
+
+
+
+-------------------------------ADD NEW OSD---------------------
+$ sudo vi group_vars/osds.yml
+
+$ ansible-playbook -vv -i hosts site.yml --limit osd1
+
+https://10.10.128.1:8443/
+
+----------------------------PURGE CLUSTER------------------------
+
+1- Purge dashboard componants
+$ ansible-playbook -vv -i hosts infrastructure-playbooks/purge-dashboard.yml
+
+2- Purge cluster.
+ansible-playbook -vv -i hosts infrastructure-playbooks/purge-cluster.yml
+
+
+this for non-contenarized installation.
+
+
+----------------------------CEPH CLUSTER CONTAINERIZED DEPLOYMENT-----------
+
+
+cp site-container.yml.sample site-container.yml
+
+
+Edit the file group_vars/all.yml and add containerized_deployment: true
+
+ansible-playbook -u cephuser site-container.yml -i hosts
+
+
+
+Go inside cluster
+
+[cephuser@mon1 infrastructure-playbooks]$ sudo podman exec -it ceph-mon-mon1 bash
+[root@mon1 /]#
+
+ceph config set mon mon_warn_on_insecure_global_id_reclaim_allowed false
+
+
+
+Alternatively
+
+To use the ceph command directly on a client node without entering a Ceph container, you need to have the Ceph utilities and libraries installed on that node. Here's how you can set up and use the ceph command directly:
+
+Install Ceph Packages.
+1-sudo yum install ceph-common
+2- Copy the necessary Ceph configuration files (ceph.conf, keyring, etc.) to the client node.
+3- export CEPH_CONF=/path/to/ceph.conf
+4- ceph -s
+
+
+
+64 -> 32 . 4 Control plan (
+
+
+-----------------------------PURGE CONTAINERIZED INSTALL--------------
+
+purge-container-cluster.yml
+1- Purge dashboard componants
+$ ansible-playbook -vv -i hosts infrastructure-playbooks/purge-dashboard.yml
+
+2- Purge cluster.
+ansible-playbook -vv -i hosts infrastructure-playbooks/purge-container-cluster.yml

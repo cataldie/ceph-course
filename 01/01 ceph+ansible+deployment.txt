@@ -1,0 +1,130 @@
+# 
+sudo nano /etc/hosts
+
+192.168.121.101 ceph-node1
+
+192.168.121.102 ceph-node2
+
+192.168.121.103 ceph-node3
+
+192.168.121.151 ceph-client1
+
+
+#change hostname
+hostname
+sudo nano /etc/hosts
+sudo nano /etc/hostname
+
+sudo reboot now
+
+#firewall
+sudo ufw allow 6789/tcp
+sudo ufw allow 6800:7100/tcp
+
+
+#libvirt setup machine ip by mac address
+
+virsh  net-list
+virsh  net-edit  $NETWORK_NAME 
+
+
+<dhcp>
+  <range start="192.168.122.100" end="192.168.122.254"/>
+  <host mac="52:54:00:1d:eb:b7" name="ceph-node-1" ip="192.168.121.101" />
+  <host mac="52:54:00:05:d7:cf" name="ceph-node-2" ip="192.168.121.102" />
+  <host mac="52:54:00:1d:eb:b7" name="ceph-node-3" ip="192.168.121.103" />
+  <host mac="52:54:00:4d:65:f0" name="ceph-client1" ip="192.168.121.151" />
+</dhcp>
+
+virsh  net-destroy  $NETWORK_NAME  
+virsh  net-start    $NETWORK_NAME 
+
+sudo systemctl stop libvirtd
+sudo systemctl start libvirtd
+
+
+2- REPOSITORY CONFIGURATION
+
+$ sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+$ sudo dnf -y config-manager --set-enabled powertools
+
+3- Git install
+
+[cephuser@mon1 ~]$ sudo dnf install git -y
+
+4- Clone ceph-ansible project:
+
+[cephuser@mon1 ~]$  git clone https://github.com/ceph/ceph-ansible.git
+
+[cephuser@mon1 ~]$ ls
+ceph-ansible
+[cephuser@mon1 ~]$
+
+
+Go to the ceph pacific branch.
+
+
+[cephuser@mon1 ~]$ cd ceph-ansible/
+[cephuser@mon1 ceph-ansible]$ git checkout $branch
+Votre branche est à jour avec 'origin/main'.
+[cephuser@mon1 ceph-ansible]$
+[cephuser@mon1 ceph-ansible]$
+[cephuser@mon1 ceph-ansible]$ git checkout stable-6.0
+la branche 'stable-6.0' est paramétrée pour suivre 'origin/stable-6.0'.
+Basculement sur la nouvelle branche 'stable-6.0'
+[cephuser@mon1 ceph-ansible]$
+
+4 - Install pip-python
+
+
+[cephuser@mon1 ceph-ansible]$ sudo apt install python3-pip -y
+
+
+[cephuser@mon1 ceph-ansible]$ pip3 install setuptools-rust --user
+
+$ pip3 install wheel --user
+
+$export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+
+
+[cephuser@mon1 ceph-ansible]$  pip3 install --upgrade pip --user
+
+
+
+5-Use pip and the provided requirements.txt file in the ceph-ansible directory to install Ansible and the other necessary Python libraries:
+
+$pip3 install -r requirements.txt --user
+
+$ echo "PATH=\$PATH:/usr/local/bin" >>~/.bashrc &&  source ~/.bashrc
+
+
+6- Installing the ansible utils package for configuring network interfaces
+$ sudo apt install ansible
+
+ ansible-galaxy collection install ansible.utils
+ 
+7 - Passwordless configuration
+
+Set the SSH key pair on your Ceph deployment node (MON1) and copy the public key to all storage nodes.
+
+
+
+a-  ssh-keygen
+
+$ ssh-keygen 
+
+
+$ssh-copy-id vagrant@ceph-node1
+$ssh-copy-id vagrant@ceph-node2
+
+$ssh-copy-id cephuser@osd2
+$ssh-copy-id cephuser@osd3
+$ssh-copy-id cephuser@mon1
+$ssh-copy-id cephuser@mon2
+$ssh-copy-id cephuser@mon3
+$ssh-copy-id cephuser@rgwiscsi1
+$ssh-copy-id cephuser@rgwiscsi2
+$ssh-copy-id ss@mdsgan1
+$ssh-copy-id cephuser@mdsgan2
+
+---------------

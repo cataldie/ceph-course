@@ -1,0 +1,52 @@
+# hosts Update the Inventory
+[ vagrant@ceph-node1 ceph-ansible] $ nano hosts
+
+ceph-client1 ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
+
+[clients]
+ceph-client1
+
+# Create a Playbook for Ceph Clients
+[ vagrant@ceph-node1 ceph-ansible] $ nano group_vars/clients.yml
+
+ceph_client_keyring_path: "/etc/ceph/ceph.client.keyring"
+ceph_cluster_name: "ceph"
+ceph_monitors:
+  - ceph-node1:6789
+
+# Additional Ceph client configuration options
+ceph_conf_overrides:
+  global:
+    fsid: "{{ ceph_fsid }}"
+    mon_initial_members: "{{ groups['mons'] }}"
+    mon_host: "{{ ceph_monitors | map('regex_replace', '([^:]+):.*', '\\1') | join(',') }}:6789"
+
+# You can add more client-specific configuration options here if needed
+
+In this example:
+
+ceph_client_keyring_path: Specifies the path to the keyring file for Ceph clients. You can customize this path based on your preferences.
+
+ceph_cluster_name: Specifies the name of your Ceph cluster. This should match the cluster name used in the Ceph configuration.
+
+ceph_monitors: Lists the monitor nodes and their respective ports. Update the IP addresses accordingly.
+
+ceph_conf_overrides: Provides additional Ceph configuration options. In this example, it includes the cluster FSID, monitor members, and monitor host.
+
+
+# Run the Playbook
+
+[ vagrant@ceph-node1 ceph-ansible] $ ansible-playbook -u vagrant site.yml -i hosts
+
+# check if has ceph.client.admin.keyring
+[ vagrant@ceph-node1 ceph-ansible] $ ls /etc/ceph/
+
+[ root@ceph-node1 ] $ ceph auth get-or-create client.rbd mon 'allow r' osd 'allow class-read object_prefix rdb_children, allow rwx pool=rbd'
+
+[ root@ceph-node1 ] $ ceph auth get client.rbd -o /etc/ceph/ceph.client.rbd.keyring
+
+[ root@ceph-node1 ] $ scp /etc/ceph/ceph.client.rbd.keyring vagrant@ceph-client1:/home/vagrant/
+
+[ root@client-node1 ] $ sudo mv /home/vagrant/ceph.client.rbd.keyring /etc/ceph/
+
+[ root@client-node1 ] $ sudo chmod 644 /etc/ceph/ceph.client.rbd.keyring
