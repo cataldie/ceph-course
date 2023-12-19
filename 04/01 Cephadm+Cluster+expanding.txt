@@ -4,15 +4,14 @@
 
 
 
-#  ssh-copy-id -f -i /etc/ceph/ceph.pub osd1.ceph.example.com
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-node2
 
-#  ssh-copy-id -f -i /etc/ceph/ceph.pub osd2.ceph.example.com
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-node3
 
-#  ssh-copy-id -f -i /etc/ceph/ceph.pub osd3.ceph.example.com
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-osd1
 
-#  ssh-copy-id -f -i /etc/ceph/ceph.pub mon2.ceph.example.com
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-osd2
 
-#  ssh-copy-id -f -i /etc/ceph/ceph.pub mon3.ceph.example.com
 
 
 
