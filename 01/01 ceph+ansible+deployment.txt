@@ -43,11 +43,6 @@ Set the SSH key pair on your Ceph deployment node (MON1) and copy the public key
 
 a-  ssh-keygen
 
-$ ssh-keygen 
 
-$ ssh-copy-id vagrant@ceph-node1
-$ ssh-copy-id vagrant@ceph-osd1
-$ ssh-copy-id vagrant@ceph-osd2
-$ ssh-copy-id vagrant@ceph-client1
 
 ---------------
