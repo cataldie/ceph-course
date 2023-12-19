@@ -1,0 +1,19 @@
+We will now take a look at the CRUSH map of our Ceph cluster:
+
+1.	Extract the CRUSH map from any of the monitor nodes:
+
+# ceph osd getcrushmap -o crushmap_compiled_file
+
+2.	Once you have the CRUSH map, decompile it to convert it into a human- readable/editable form:
+
+# crushtool -d crushmap_compiled_file
+-o crushmap_decompiled_file
+
+At this point, the output file, crushmap_decompiled_file, can be viewed/edited in your favorite editor. In the next recipe, we will learn how to perform changes to the CRUSH map.
+3.	Once the changes are done, you should compile these changes:
+
+# crushtool -c crushmap_decompiled_file -o newcrushmap
+
+4.	Finally, inject the newly compiled CRUSH map into the Ceph cluster:
+
+# ceph osd setcrushmap -i newcrushmap
