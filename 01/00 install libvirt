@@ -36,3 +36,43 @@ $ ssh vagrant@192.168.122.87
 #firewall
 $  sudo ufw allow 6789/tcp
 $  sudo ufw allow 6800:7100/tcp
+
+# 
+sudo nano /etc/hosts
+
+192.168.122.101 ceph-node1
+192.168.122.102 ceph-node2
+192.168.122.103 ceph-node3
+192.168.122.111 ceph-osd1
+192.168.122.112 ceph-osd2
+192.168.122.151 ceph-client1
+
+
+#change hostname
+hostname
+sudo nano /etc/hosts
+sudo nano /etc/hostname
+
+sudo reboot now
+
+#libvirt setup machine ip by mac address
+
+virsh  net-list
+virsh  net-edit  $NETWORK_NAME 
+
+
+<dhcp>
+  <range start="192.168.122.100" end="192.168.122.254"/>
+  <host mac="52:54:00:1d:eb:b7" name="ceph-node1"  ip="192.168.122.101" />
+  <host mac="52:54:00:05:d7:cf" name="ceph-node2"  ip="192.168.122.102" />
+  <host mac="52:54:00:1d:eb:b7" name="ceph-node3"  ip="192.168.122.103" />
+  <host mac="52:54:00:05:d7:cf" name="ceph-osd1"  ip="192.168.122.111" />
+  <host mac="52:54:00:1d:eb:b7" name="ceph-osd2"  ip="192.168.122.112" />
+  <host mac="52:54:00:4d:65:f0" name="ceph-client1" ip="192.168.122.151" />
+</dhcp>
+
+virsh  net-destroy  $NETWORK_NAME  
+virsh  net-start    $NETWORK_NAME 
+
+sudo systemctl stop libvirtd
+sudo systemctl start libvirtd
