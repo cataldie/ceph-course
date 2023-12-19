@@ -71,4 +71,4 @@ Install the ceph-commun package ( ... ceph, rbd, ...)
 
 B- Cluster bootstraping
 
-#cephadm bootstrap --mon-ip 10.10.128.1 --cluster-network 172.16.0.0/16 --allow-fqdn-hostname
+#cephadm bootstrap --mon-ip 192.168.122.101 --cluster-network 192.168.122.0/24 --allow-fqdn-hostname
