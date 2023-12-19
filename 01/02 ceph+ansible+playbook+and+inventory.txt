@@ -64,7 +64,7 @@ $ nano hosts
 
 ceph-node1 	ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
 ceph-osd1 	ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
-
+ceph-rgwiscsi1 ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
 
 [monprimary]
 ceph-node1
@@ -76,7 +76,7 @@ ceph-node1
 ceph-node1
 # RGW
 [rgws]
-ceph-node1
+ceph-rgwiscsi1
 #Nodes deamon Manager
 [mgrs]
 ceph-node1

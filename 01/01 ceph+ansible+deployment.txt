@@ -12,7 +12,8 @@ sudo nano /etc/hosts
 192.168.122.101 ceph-node1
 192.168.122.111 ceph-osd1
 192.168.122.112 ceph-osd2
-192.168.121.151 ceph-client1
+192.168.122.151 ceph-client1
+192.168.122.121 ceph-rgwiscsi1
 
 
 #change hostname
@@ -30,10 +31,11 @@ virsh  net-edit  $NETWORK_NAME
 
 <dhcp>
   <range start="192.168.122.100" end="192.168.122.254"/>
-  <host mac="52:54:00:1d:eb:b7" name="ceph-node-1" ip="192.168.121.101" />
-  <host mac="52:54:00:05:d7:cf" name="ceph-node-2" ip="192.168.121.102" />
-  <host mac="52:54:00:1d:eb:b7" name="ceph-node-3" ip="192.168.121.103" />
-  <host mac="52:54:00:4d:65:f0" name="ceph-client1" ip="192.168.121.151" />
+  <host mac="52:54:00:1d:eb:b7" name="ceph-node-1" ip="192.168.122.101" />
+  <host mac="52:54:00:05:d7:cf" name="ceph-node-2" ip="192.168.122.102" />
+  <host mac="52:54:00:1d:eb:b7" name="ceph-node-3" ip="192.168.122.103" />
+  <host mac="52:54:00:4d:65:f0" name="ceph-client1" ip="192.168.122.151" />
+  <host mac="52:54:00:1d:eb:b7" name="ceph-rgwiscsi1" ip="192.168.122.121" />
 </dhcp>
 
 virsh  net-destroy  $NETWORK_NAME  
@@ -94,6 +96,6 @@ $ ssh-copy-id vagrant@ceph-node1
 $ ssh-copy-id vagrant@ceph-osd1
 $ ssh-copy-id vagrant@ceph-osd2
 $ ssh-copy-id vagrant@ceph-client1
-
+$ ssh-copy-id vagrant@ceph-rgwiscsi1
 
 ---------------
