@@ -61,21 +61,23 @@ log_path = $HOME/vagrant/ansible.log
 inventory=/home/vagrant/ceph-ansible/hosts
 
 $ nano hosts
-ceph-node1 ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
-ceph-osd1 ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
+
+ceph-node1 	ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
+ceph-osd1 	ansible_user=vagrant ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_sudo_pass=vagrant
+
 
 [monprimary]
 ceph-node1
-# Noeud moniteur
+# Node monitor
 [mons]
 ceph-node1
 # MDS Nodes
 [mdss]
 ceph-node1
-## RGW
-#[rgws]
-#ceph-node1
-#Noeuds du deamon Manager
+# RGW
+[rgws]
+ceph-node1
+#Nodes deamon Manager
 [mgrs]
 ceph-node1
 # (Object Storage Daemon) Nodes
@@ -84,6 +86,27 @@ ceph-osd1
 # Serveur Grafana
 [grafana-server]
 ceph-node1
+
+
+
+
+# MDS Nodes
+[mdss]
+mdsgan1
+# RGW
+[rgws]
+rgwiscsi1
+#Noeuds du deamon Manager
+[mgrs]
+mon1
+# (Object Storage Daemon) Nodes
+[osds]
+osd1
+osd2
+osd3
+# Serveur Grafana
+[grafana-server]
+mon1
 
 additionnal files to configure
 
@@ -100,4 +123,6 @@ C- Cluster deployment:
 $ ansible-playbook -u vagrant site.yml -i hosts
 
 #Once playbook completes the Ceph cluster installation job and plays the recap with failed=0, it means ceph-ansible has deployed the Ceph cluster
+
+https://ceph-node1:8443
 
