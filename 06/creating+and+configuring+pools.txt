@@ -1,0 +1,24 @@
+-------------------------------------Creating and Configuring Pools----------
+Replicated pool creation
+
+a-Create a replicated pool called replpool1 with 32 Placement Groups (PGs).
+
+/]# ceph osd pool create replpool1 32 32
+
+
+b-Verify that PG autoscaling is enabled for the replpool1 pool and that it is the default for new pools.
+
+/]# ceph osd pool get replpool1 pg_autoscale_mode
+
+/]# ceph config get mon osd_pool_default_pg_autoscale_mode
+on
+
+
+ceph osd pool delete newpool newpool --yes-i-really-really-mean-it
+ceph osd pool delete newpool newpool --yes-i-really-really-mean-it
+
+
+
+ceph osd pool create ecpool1 32 32 erasure ecprofile-k4-m2
+
+ceph osd pool delete ecpool1 ecpool1 --yes-i-really-really-mean-it

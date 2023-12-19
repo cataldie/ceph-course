@@ -6,7 +6,6 @@ df
 
 B- Configure Ansible Inventory and Ansible Playbook for ceph
 
-
 a- The first node (mon1) will be used as the administration node for the installation.
 
 [cephuser@mon1 ceph-ansible]$  cp group_vars/all.yml.sample group_vars/all.yml
@@ -74,9 +73,6 @@ ceph-node1
 # MDS Nodes
 [mdss]
 ceph-node1
-# RGW
-[rgws]
-ceph-rgwiscsi1
 #Nodes deamon Manager
 [mgrs]
 ceph-node1
@@ -86,27 +82,6 @@ ceph-osd1
 # Serveur Grafana
 [grafana-server]
 ceph-node1
-
-
-
-
-# MDS Nodes
-[mdss]
-mdsgan1
-# RGW
-[rgws]
-rgwiscsi1
-#Noeuds du deamon Manager
-[mgrs]
-mon1
-# (Object Storage Daemon) Nodes
-[osds]
-osd1
-osd2
-osd3
-# Serveur Grafana
-[grafana-server]
-mon1
 
 additionnal files to configure
 

@@ -1,0 +1,42 @@
+-------------------------------CephFS -----------------------------
+
+
+
+
+
+1- Passwordless configuration
+
+
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub mdsgan1.ceph.example.com
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub mdsgan2.ceph.example.com
+
+
+2- Nodes to cluster
+
+
+#ceph orch host add mdsgan1.ceph.example.com 10.10.128.11
+#ceph orch host add mdsgan2.ceph.example.com 10.10.128.12
+
+
+
+3- Create the two required CephFS pools. Name these pools mycephfs_data and
+mycephfs_metadata.
+[ceph: root@mon1 /]# ceph osd pool create mycephfs_data 32 32
+[ceph: root@mon1 /]# ceph osd pool create mycephfs_metadata 32 32
+
+Create the CephFS file system with the name mycephfs. 
+
+[ceph: root@mon1 /]# ceph fs new mycephfs mycephfs_metadata mycephfs_data
+
+
+
+
+4 - Deploy the MDS service on mdsgan1 and mdsgan2
+
+ceph orch apply mds mycephfs --placement="2 mdsgan1.ceph.example.com mdsgan2.ceph.example.com"
+
+
+5 - Verify that the MDS service is active.
+[ceph: root@mon1 /]# ceph mds stat

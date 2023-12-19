@@ -1,0 +1,42 @@
+-------------Navigate and work with services within the Ceph cluster-----------
+
+
+
+1- Use the ceph orch ls command within the cephadm shell to view the running services.
+# cephadm shell -- ceph orch ls
+
+
+2- use the ceph orch ps command to view the status of all cluster daemons.
+
+[ceph: root@mon1 /]# ceph orch ps
+
+
+
+3- View the cluster health.
+a -Use the ceph health command to view the health of your Ceph cluster.
+/]# ceph health
+
+b-Use the ceph status command to view the full cluster status.
+/]# ceph status
+
+
+
+
+4- Explore the Ceph cluster by viewing the cluster components.
+
+a-Use the ceph mon dump command to view the cluster MON map.
+/]# ceph mon dump
+
+b-Use the ceph mgr stat command to view the cluster MGR status.
+/]# ceph mgr stat
+
+c- Use the ceph osd pool ls command to view the cluster pools.
+/]# ceph osd pool ls
+d- Use the ceph pg stat command to view Placement Group (PG) status
+/]# ceph pg stat
+
+e-Use the ceph osd status command to view the status of all OSDs.
+/]# ceph osd status
+
+g-Use the ceph osd crush tree command to view the cluster CRUSH hierarchy.
+ /]# 

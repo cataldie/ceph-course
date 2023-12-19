@@ -1,0 +1,166 @@
+# Managing RADOS Block Devices
+
+The goal of this guide is to demonstrate the creation and management of RADOS block device images, which can be utilized as regular block devices. Before proceeding with the steps, ensure that the Ceph cluster status is HEALTH_OK by executing the following command:
+
+```bash
+ceph health
+```
+
+## Step 1: Create Replicated Pool with Application Type
+
+1. Create a replicated pool called "labpool1" with 32 placement groups using the following command:
+
+```bash
+ceph osd pool create labpool1 32 32
+```
+
+2. Set the application type for the pool to "rbd" using:
+
+```bash
+rbd pool init labpool1
+```
+
+3. Generate the necessary authentication credentials for the pool:
+
+```bash
+ceph auth get-or-create client.labpool1.client1 \
+    mon 'profile rbd' osd 'profile rbd' \
+    -o /etc/ceph/ceph.client.labpool1.client1.keyring
+```
+
+## Step 2: Configure the Client Node
+
+1. On the client node (clientb), install the required Ceph packages:
+
+```bash
+yum install centos-release-ceph-pacific epel-release -y
+yum install ceph-common -y
+```
+
+2. Export CEPH_ARGS to specify the client's ID:
+
+```bash
+export CEPH_ARGS='--id=labpool1.client1'
+```
+
+3. Verify the cluster connection:
+
+```bash
+rbd ls labpool1
+```
+
+## Step 3: Create and Mount RBD Images
+
+1. Create an RBD image in "labpool1" named "test" with a size of 128 MB:
+
+```bash
+rbd create labpool1/test --size=128M
+```
+
+2. Map the RBD image on the clientb node using the kernel RBD client:
+
+```bash
+rbd map labpool1/test
+```
+
+3. Show mapped RBD devices:
+
+```bash
+rbd showmapped
+```
+
+4. Format the mapped RBD image with XFS:
+
+```bash
+mkfs.xfs /dev/rbd0
+```
+
+5. Create a mount point:
+
+```bash
+mkdir /mnt/rbd
+```
+
+6. Mount the RBD image to the mount point:
+
+```bash
+mount /dev/rbd0 /mnt/rbd
+```
+
+7. Review the file system usage:
+
+```bash
+df /mnt/rbd
+```
+
+8. Add content to the file system (e.g., create a file named "test1"):
+
+```bash
+dd if=/dev/zero of=/mnt/rbd/test1 bs=10M count=1
+```
+
+9. Verify the content and file size:
+
+```bash
+ls /mnt/rbd
+df /mnt/rbd
+```
+
+## Step 4: Unmap and Configure Persistent Mounting
+
+1. Unmount the file system and unmap the RBD image:
+
+```bash
+umount /mnt/rbd
+rbd unmap /dev/rbd0
+```
+
+2. Configure the client system to persistently mount the RBD image as "/mnt/rbd."
+
+3. Create an entry for "labpool1/test" in the RBD map file:
+
+```bash
+echo "labpool1/test id=labpool1.client1,keyring=/etc/ceph/ceph.client.labpool1.client1.keyring" >> /etc/ceph/rbdmap
+```
+
+4. Create an entry for "/dev/rbd/labpool1/test" in the "/etc/fstab" file:
+
+```bash
+echo "/dev/rbd/labpool1/test /mnt/rbd xfs noauto 0 0" >> /etc/fstab
+```
+
+5. Re-map the RBD device:
+
+```bash
+rbdmap map
+```
+
+6. Check the mapped devices:
+
+```bash
+rbd showmapped
+```
+
+7. Enable the rbdmap service to ensure persistent mounting:
+
+```bash
+systemctl enable rbdmap
+```
+
+8. Reboot the clientb node to verify that the RBD device mounts persistently.
+
+## Step 5: Clean Up
+
+1. If needed, remove the RBD image:
+
+```bash
+rbd rm labpool1/test --id labpool1.client1
+```
+
+2. List the contents of the "labpool1" pool:
+
+```bash
+rados -p labpool1 ls --id labpool1.client1
+```
+
+Please ensure to follow these instructions carefully to create and manage RADOS block devices effectively.

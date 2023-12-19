@@ -1,0 +1,102 @@
+The installation process enables cephx by default, so that the cluster requires user authentication and authorization by all client applications.
+
+Ceph uses user accounts for several purposes:
+
+For internal communication between Ceph daemons. (Ex: osd.1 or mgr.mon2.dndgpu )
+
+For client applications accessing the cluster through the librados library. (client.XXX
+
+For cluster administrators.(client.admin)
+
+
+A- User Management
+
+To list existing user accounts, run the ceph auth list command:
+[ceph: root@node /]# ceph auth list
+
+To get the details of a specific account, use the ceph auth get command:
+[ceph: root@node /]# ceph auth get client.admin
+
+You can print the secret key:
+[ceph: root@node /]# ceph auth print-key client.admin
+
+
+To export and import user accounts, run the ceph auth export and ceph auth import
+commands:
+[ceph: root@node /]# ceph auth export client.operator1 > ~/operator1.export
+[ceph: root@node /]# ceph auth import -i ~/operator1.export
+
+1- Creating New User Accounts
+The ceph auth get-or-create command creates a new user account and generates its secret
+key. The command prints this key to stdout by default, so it is common to add the -o option to
+save standard output to a key-ring file.
+
+This example creates the app1 user account with read and write access to all pools, and stores the
+key-ring file in /etc/ceph/ceph.client.app1.keyring:
+
+[ceph: root@node /]# ceph auth get-or-create client.app1 \
+mon 'allow r' osd 'allow rw' -o /etc/ceph/ceph.client.app1.keyring
+Authentication requires the key-ring file, so you must copy the file to all client systems that
+operate with this new user account.
+
+2-Modifying User Capabilities
+Modify the capabilities of a user account with the ceph auth caps command.
+
+This example modifies the app1 user account capabilities on OSDs to allow only read and write
+access to the myapp pool:
+[ceph: root@node /]# ceph auth caps client.app1 mon 'allow r' \
+osd 'allow rw pool=myapp'
+
+The ceph auth caps command overwrites existing capabilities When using this command, you
+must specify the full set of capabilities for all daemons, not only those you want to modify. Define
+an empty string to remove all capabilities:
+[ceph: root@node /]# ceph auth caps client.app1 osd ''
+
+
+3-Deleting User Accounts
+The ceph auth del command deletes a user account:
+[ceph: root@node /]# ceph auth del client.app1
+
+
+
+C- Restricting Access
+
+Restrict user OSD permissions such that users can only access the pools they need. This example
+creates the formyapp2 user and limits their access to read and write on the myapp pool:
+[ceph: root@node /]# ceph auth get-or-create client.formyapp2 \
+mon 'allow r' osd 'allow rw pool=myapp'
+
+If you do not specify a pool when you configure capabilities, then Ceph sets them on all existing
+pools.
+The cephx mechanism can restrict access to objects by other means:
+• By object name prefix. The following example restricts access to only those objects whose
+names start with pref in any pool.
+[ceph: root@node /]# ceph auth get-or-create client.formyapp3 \
+mon 'allow r' osd 'allow rw object_prefix pref'
+• By namespace. Implement namespaces to logically group objects within a pool. You can then
+restrict user accounts to objects belonging to a specific namespace:
+[ceph: root@node /]# ceph auth get-or-create client.designer \
+mon 'allow r' osd 'allow rw namespace=photos'
+• By path. The Ceph File System (CephFS) utilizes this method to restrict access to specific
+directories. This example creates a new user account, webdesigner, that can access only the /
+webcontent directory and its contents:
+[ceph: root@node /]# ceph fs authorize cephfs client.webdesigner /webcontent rw
+[ceph: root@node /]# ceph auth get client.webdesigner
+exported keyring for client.webdesigner
+[client.webdesigner]
+ key = AQBrVE9aNwoEGRAApYR6m71ECRzUlLpp4wEJkw==
+ caps mds = "allow rw path=/webcontent"
+ caps mon = "allow r"
+ caps osd = "allow rw pool=cephfs_data"
+• By Monitor command. This method restricts administrators to a specific list of commands. The
+following example creates the operator1 user account and limits its access to two commands:
+[ceph: root@node /]# ceph auth get-or-create client.operator1 \
+mon 'allow r, allow command "auth get-or-create", allow command "auth list"'
+
+
+
+LAB: Configure two users for an application with the following capabilites. 
+The first user, client.docedit, stores and retrieves documents in the docs namespace of the replpool1 pool. 
+
+The second user, client.docget, only retrieves documents from the replpool1 pool.
+

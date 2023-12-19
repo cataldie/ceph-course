@@ -1,0 +1,139 @@
+----------------Managing and Customizing the CRUSH Map
+
+
+Objective: 
+You should be able to create data placement rules to target a specific device class, 
+create a pool by using a specific data placement rule, and decompile and edit the CRUSH map.
+
+
+A- Create a crush rule write only on fastest devices 
+ 
+ 
+ a- List the available device classes in your cluster
+ # ceph osd crush class ls
+ 
+ b -  Display the CRUSH map tree to locate the OSDs backed by SSD storage
+ # ceph osd crush tree
+ 
+ c- Add a new CRUSH map rule called onssd to target the OSDs with SSD devices 
+  #ceph osd crush rule create-replicated onssd default host ssd
+  
+  d-  Use the ceph osd crush rule ls command to verify the successful creation of the new rule.
+   #ceph osd crush rule ls
+   
+
+Create a new replicated pool called myfast with 32 placement groups that uses the onssd CRUSH map rule.  
+#ceph osd pool create myfast 32 32 onssd
+
+
+/!\ Verify that the placement groups for the pool called myfast are only using the OSDsbacked by SSD storage.
+# ceph osd lspools
+
+
+# ceph pg dump pgs_brief
+
+
+
+B ------------------------  Edit crush Map -----------------
+
+1-Create bucket variables
+
+# ceph osd crush add-bucket rack1 rack
+# ceph osd crush add-bucket rack2 rack
+# ceph osd crush add-bucket rack3 rack
+
+
+
+2-Use the ceph osd crush move command to build the hierarchy.
+
+
+# ceph osd crush move rack1 root=default
+# ceph osd crush move rack2 root=default
+# ceph osd crush move rack3 root=default
+# ceph osd crush move osd1 rack=rack1
+# ceph osd crush move osd2 rack=rack2
+# ceph osd crush move osd3 rack=rack3
+# ceph osd crush move osd4 rack=rack3
+
+/]# ceph osd crush tree
+
+C- Create a rule to data first on SSD type device on rack1.
+
+a- Retrieve the current CRUSH map by using the ceph osd getcrushmap command.
+Store the binary map in the /tmp/crushmap.bin file.
+
+#ceph osd getcrushmap -o /tmp/crushmap.bin
+
+a -  Use the crushtool command to decompile the binary map to the file /tmp/crushmap.bin
+
+/]# crushtool -d /tmp/crushmap.bin -o /tmp/crushmap.txt
+/]# echo $?
+
+c- Save a copy of the CRUSH map as /tmp/crushmap-new.txt, and add the following rule at the
+end of the file
+
+/]# cp /tmp/crushmap.txt /tmp/crushmap-new.txt
+/]# cat /tmp/crushmap-new.txt
+
+rule replicated_hybrid_rule {
+     id 3
+     type replicated
+     min_size 1
+     max_size 3
+     step take rack1 class ssd
+     step chooseleaf firstn 0 type host
+     step emit
+     step take rack2 class hdd
+     step chooseleaf firstn 0 type host
+     step emit
+     step take rack3 class hdd
+     step chooseleaf firstn 0 type host
+     step emit
+}
+
+
+
+
+/!\With this rule, the first replica uses an OSD from rack1 (backed by SSD storage),
+and the remaining replicas use OSDs backed by HDD storage from different racks.
+
+
+d- Compile your new CRUSH map
+
+# crushtool -c /tmp/crushmap-new.txt -o /tmp/crushmap-new.bin
+crushtool -c /tmp/crushmap-new.txt -o /tmp/crushmap-new.bin
+
+
+
+e- Before applying the new map to the running cluster, use the crushtool command
+with the --show-mappings option to verify that the first OSD is always from rack1.
+
+/]# crushtool -i /tmp/crushmap-new.bin --test --show-mappings --rule=3 --num-rep 3
+
+#  ceph osd crush tree
+
+/!\The first OSD should corresponds to the OSDs with SSD devices from rack1
+
+
+f- Apply the new CRUSH map to your cluster by using the ceph osd setcrushmap
+command.
+
+# ceph osd setcrushmap -i /tmp/crushmap-new.bin
+
+g-  Verify that the new replicated_hybrid_rule rule is now available.
+
+
+]# ceph osd crush rule ls
+
+h- Create a new replicated pool called testcrush with 32 placement groups and use
+the replicated_hybrid_rule CRUSH map rule.
+
+/]# ceph osd pool create testcrush 32 32 replicated_hybrid_rule
+
+i- Verify that the first OSDs for the placement groups in the pool called testcrush are
+the ones from rack1. 
+
+# ceph osd lspools
+
+
+]# ceph pg dump pgs_brief | grep ^6

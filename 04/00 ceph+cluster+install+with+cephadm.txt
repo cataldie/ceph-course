@@ -1,0 +1,61 @@
+-------------------------------Deployment of a Ceph Cluster with Cephadm-------------------
+
+1- Cephadm Deployment prerequisites
+
+a- docker or podman
+Cephadm uses Docker or Podman to deploy Ceph daemons as containers.
+
+$sudo yum install -y yum-utils
+$sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+$sudo yum install docker-ce docker-ce-cli containerd.io -y --allowerasing
+$ sudo systemctl start docker && sudo  systemctl enable docker
+------------------
+sudo dnf update -y &&
+sudo dnf install dnf-plugins-core -y &&
+sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo &&
+sudo dnf config-manager --add-repo=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8_Stream/devel:kubic:libcontainers:stable.repo &&
+sudo dnf install podman -y &&
+podman version &&
+sudo dnf install -y python3 &&
+sudo yum -y install lvm2
+
+b- python3
+Cephadm is a Python-based tool, so you need to install Python3 before you can install it.
+
+
+$ sudo dnf install -y python3
+
+c- lvm2:
+Cephadm uses LVM to create and manage the storage for Ceph OSDs. LVM is a Logical Volume Manager, which allows you to create logical volumes from physical disks. 
+
+$ sudo yum -y install lvm2
+
+
+2- Cephadm install
+
+A-
+clone thne cephadm project
+
+# curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
+
+
+Make it executable
+
+# chmod +x cephadm
+
+Add the ceph pacific repo to the server
+
+# ./cephadm add-repo --release pacific 
+
+#./cephadm install
+
+
+Install the ceph-commun package ( ... ceph, rbd, ...)
+
+
+
+# cephadm install ceph-common
+
+B- Cluster bootstraping
+
+#cephadm bootstrap --mon-ip 10.10.128.1 --cluster-network 172.16.0.0/16 --allow-fqdn-hostname

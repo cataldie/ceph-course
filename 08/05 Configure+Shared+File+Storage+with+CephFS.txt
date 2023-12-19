@@ -1,0 +1,111 @@
+# Configure Shared File Storage with CephFS
+
+This guide explains how to configure user access restrictions to different folders on a CephFS shared file storage system. We'll use both the kernel client and the FUSE client to mount CephFS file systems.
+
+**Prerequisites:**
+1. Ensure that your Ceph cluster is up and running, and its health is verified using `ceph -s` and `ceph df`.
+2. Install the required Ceph packages on all nodes that will be part of the CephFS mount.
+
+## Step 1: Mount CephFS Using Kernel Client
+
+1. Create a mount point for CephFS: `/mnt/mycephfs`.
+2. Mount CephFS using the kernel client:
+```bash
+# mkdir /mnt/mycephfs
+# mount -t ceph mon1.ceph.example.com:/ /mnt/mycephfs -o name=admin
+```
+
+3. Create two directories within the mounted CephFS:
+```bash
+# mkdir /mnt/mycephfs/dir1
+# mkdir /mnt/mycephfs/dir2
+```
+
+## Step 2: Create Test Files
+
+1. Create some test files in `/mnt/mycephfs/dir1`:
+```bash
+# touch /mnt/mycephfs/dir1/atestfile
+# dd if=/dev/zero of=/mnt/mycephfs/dir1/ddtest bs=1024 count=10000
+```
+
+## Step 3: Unmount CephFS
+
+Unmount the CephFS file system after the test:
+```bash
+# umount /mnt/mycephfs
+```
+
+## Step 4: Check CephFS Status
+
+1. Check the CephFS status using the cephadm shell:
+```bash
+# cephadm shell -- ceph fs status
+```
+
+2. The size reported will be larger because CephFS replicates data across multiple Ceph nodes.
+
+## Step 5: Configure User Access Restrictions
+
+1. Create a new user `userceph` with read access to the root folder and read and write permissions to `dir2` folder. Use `cephadm shell --mount` to copy the user keyring file to `/etc/ceph/` on mon1:
+```bash
+# ceph fs authorize mycephfs client.userceph / r /dir2 rw
+# ceph auth get client.userceph -o /mnt/ceph.client.userceph.keyring
+```
+
+2. Copy the `ceph.conf` and `ceph.client.userceph.keyring` files to the client node (`clientcent1`).
+
+## Step 6: Mount CephFS with User Permissions
+
+Use the kernel client to mount the CephFS file system with the `userceph` user:
+```bash
+# mount -t ceph mon1.ceph.example.com:/ /mnt/mycephfs -o name=userceph,fs=mycephfs
+```
+
+Test the user permissions in different folders and files.
+
+## Step 7: Unmount CephFS
+
+Unmount the CephFS file system after testing:
+```bash
+# umount /mnt/mycephfs
+```
+
+## Step 8: Use Ceph-FUSE Client
+
+Install the Ceph-FUSE package and mount the file system:
+```bash
+# mkdir /mnt/mycephfuse
+# dnf -y install centos-release-ceph-pacific epel-release
+# dnf -y install ceph-fuse
+# ceph-fuse -n client.userceph --client_fs mycephfs /mnt/mycephfuse
+```
+
+## Step 9: Unmount Ceph-FUSE
+
+Unmount the Ceph-FUSE file system after testing:
+```bash
+# umount /mnt/mycephfuse
+```
+
+## Step 10: Persistently Mount CephFS with FUSE Client
+
+Configure the `/etc/fstab` file to mount the CephFS file system at startup:
+```bash
+# cat >> /etc/fstab <<EOF
+mon1.ceph.example.com:/ /mnt/mycephfuse fuse.ceph ceph.id=userceph,_netdev 0 0
+EOF
+```
+
+Mount the `/mnt/mycephfuse` folder using the `mount -a` command and verify with the `df` command:
+```bash
+# mount -a
+# df
+```
+
+Unmount the `/mnt/mycephfuse` folder after testing:
+```bash
+# umount /mnt/mycephfuse
+```
+
+Following these steps, you should be able to configure shared file storage using CephFS with proper user access restrictions.

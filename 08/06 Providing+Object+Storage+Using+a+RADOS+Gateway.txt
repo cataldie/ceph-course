@@ -1,0 +1,103 @@
+----------------------- Providing Object Storage Using a RADOS Gateway -----------
+
+
+
+Requirement installation:
+
+Nodes: rgwiscsi1 rgwiscsi2, haproxy01
+
+sudo dnf update -y &&
+sudo dnf install dnf-plugins-core -y &&
+sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo &&
+sudo dnf config-manager --add-repo=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8_Stream/devel:kubic:libcontainers:stable.repo &&
+sudo dnf install podman -y &&
+podman version &&
+sudo dnf install -y python3 &&
+sudo yum -y install lvm2
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub rgwiscsi1.ceph.example.com
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub rgwiscsi2.ceph.example.com
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub haproxy01.ceph.example.com
+
+
+2- Nodes to cluster
+
+
+#ceph orch host add rgwiscsi1.ceph.example.com 10.10.128.9
+#ceph orch host add rgwiscsi2.ceph.example.com 10.10.128.10
+#ceph orch host add haproxy01.ceph.example.com 10.10.128.18
+
+
+----------------Service deployment
+
+
+a- create a yml deplyment file
+
+
+rgw_service.yaml
+service_type: rgw
+service_id: myrealm.myzone
+service_name: rgw.myrealm.myzone
+placement:
+  count: 2
+  hosts:
+  - rgwiscsi1.example.com
+  - rgwiscsi1.example.com
+spec:
+  rgw_frontend_port: 8080
+  
+  b- Use the Ceph orchestrator to create an RGW service with the rgw_service.yaml file. 
+  
+  View the cluster and RGW service status.
+  
+  
+  /]# ceph orch apply -i rgw_service.yaml
+  
+  
+  
+  c- View the cluster status and find the status of the new RGW service daemons.
+
+[ceph: root@clienta /]# ceph status
+
+d- Verify that the orchestrator created two running daemons per node.
+
+[ceph: root@clienta /]# ceph orch ps --daemon-type rgw
+
+
+
+
+e-  on rgw nodes
+
+
+]# podman ps -a --format "{{.ID}} {{.Names}}" | grep rgw
+
+
+
+HA Configuration
+
+cd /var/lib/ceph/radosgw/
+
+
+# vi ingress.yaml
+service_type: ingress
+service_id: rgw.myrealm.myzone
+placement:
+  hosts:
+    - haproxy01.ceph.example.com
+spec:
+  backend_service: rgw.myrealm.myzone
+  virtual_ip: 10.10.128.18/24
+  frontend_port: 8080
+  monitor_port: 1967
+  virtual_interface_networks:
+    - 10.10.0.0/16
+
+# cephadm shell --mount ingress.yaml:/var/lib/ceph/radosgw/igress.yaml
+
+cd /var/lib/ceph/radosgw/
+
+ceph orch apply -i ingress.yaml
+
+
+
+ceph orch ls

@@ -1,0 +1,66 @@
+---------------- Cluster expending-------------------
+
+1- Passwordless connexion between cephadm orchestrator and other nodes.
+
+
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub osd1.ceph.example.com
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub osd2.ceph.example.com
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub osd3.ceph.example.com
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub mon2.ceph.example.com
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub mon3.ceph.example.com
+
+
+
+check the list of hosts within the cluster.
+
+
+# ceph orch host ls
+
+/!\
+
+To disable the Orchestrator from automatically provisioning MON or MGR deamon to any new host, set the unmanaged.
+
+[root@monnode1 ~]# ceph orch apply mon --unmanaged
+Scheduled mon update...
+[root@monnode1 ~]# ceph orch apply mgr --unmanaged
+Scheduled mgr update...
+[root@monnode1 ~]#
+
+
+2- Add a new host to the cluster
+
+~]# ceph orch host add NODE_HOSTNAME NODE_IP
+
+ceph orch host add osd7.ceph.example.com 10.10.128.7
+
+3 add label to the hosts
+
+
+[root@monnode1 ~]# ceph orch host label add mon2.ceph.example.com mon
+[root@monnode1 ~]# ceph orch host label add mon3.ceph.example.com mon
+[root@monnode1 ~]# ceph orch host label add mon2.ceph.example.com mgr
+
+[root@monnode1 ~]# ceph orch host label add osd1.ceph.example.com osd
+[root@monnode1 ~]# ceph orch host label add osd2.ceph.example.com osd
+[root@monnode1 ~]# ceph orch host label add osd3.ceph.example.com osd
+[root@monnode1 ~]#
+
+
+4 - Verify the hosts added
+
+
+#ceph orch hosts ls
+
+
+
+
+5- Deploy MON and MGR deamon 
+
+
+# ceph orch apply mon --placement="3 mon1.ceph.example.com mon2.ceph.example.com mon3.ceph.example.com"
+# ceph orch apply mgr --placement="2 mon1.ceph.example.com mon2.ceph.example.com"

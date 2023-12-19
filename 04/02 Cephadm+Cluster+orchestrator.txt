@@ -1,0 +1,17 @@
+---------------------------Ceph Orchestrator----------------------
+The cephadm utility consists of two main components:
+• The cephadm shell.
+• The cephadm orchestrator.
+
+The cephadm orchestrator provides a command-line interface to the orchestrator ceph-mgr modules, 
+which interface with external orchestration services. The purpose of an orchestrator is
+to coordinate configuration changes that must be performed cooperatively across multiple nodes
+and services in a storage cluster.
+
+[root@node ~]# cephadm shell
+/]#
+
+
+To run a single command, use the cephadm shell command followed by two dashes and the
+Ceph command.
+]# cephadm shell -- CEPH_COMMAND
