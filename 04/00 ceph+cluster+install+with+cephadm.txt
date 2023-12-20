@@ -1,5 +1,6 @@
 -------------------------------Deployment of a Ceph Cluster with Cephadm-------------------
 $ sudo nano /etc/ssh/sshd_config
+PermitRootLogin yes
 $ sudo restart sshd
 $ sudo passwd root
 
