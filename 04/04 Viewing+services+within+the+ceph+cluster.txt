@@ -19,7 +19,7 @@ a -Use the ceph health command to view the health of your Ceph cluster.
 b-Use the ceph status command to view the full cluster status.
 /]# ceph status
 
-
+ceph config set mon mon_data_avail_warn false
 
 
 4- Explore the Ceph cluster by viewing the cluster components.
