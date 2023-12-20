@@ -34,3 +34,5 @@ $ ceph orch ls
 To disable the Orchestrator from automatically provisioning OSDs, set the unmanaged flag to true.
 
 # ceph orch apply osd --all-available-devices --unmanaged=true
+
+$ ceph orch ls
