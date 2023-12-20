@@ -89,7 +89,8 @@ rule replicated_hybrid_rule {
 }
 
 
-
+# check the new rule
+crushtool -i /tmp/crushmap-new.bin --test --show-mappings --rule=3 --num-rep 3
 
 /!\With this rule, the first replica uses an OSD from rack1 (backed by SSD storage),
 and the remaining replicas use OSDs backed by HDD storage from different racks.
