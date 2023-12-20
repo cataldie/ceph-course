@@ -46,3 +46,5 @@ g-Use the ceph osd crush tree command to view the cluster CRUSH hierarchy.
  add a new psw
  $ ceph dashboard ac-user-set-password admin -i dashboard_password.yml
  $more dashboard_password.yml
+add a new psw
+  $ ceph dashboard ac-user-create --pwd_update_required test -i dashboard_password.yml ml administrator
