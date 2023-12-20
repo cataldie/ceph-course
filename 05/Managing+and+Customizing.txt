@@ -15,15 +15,15 @@ A- Create a crush rule write only on fastest devices
  b -  Display the CRUSH map tree to locate the OSDs backed by SSD storage
  # ceph osd crush tree
  
- c- Add a new CRUSH map rule called onssd to target the OSDs with SSD devices 
-  #ceph osd crush rule create-replicated onssd default host ssd
+ c- Add a new CRUSH map rule called onhdd to target the OSDs with HDD devices 
+  #ceph osd crush rule create-replicated onhdd default host hdd
   
   d-  Use the ceph osd crush rule ls command to verify the successful creation of the new rule.
    #ceph osd crush rule ls
    
 
-Create a new replicated pool called myfast with 32 placement groups that uses the onssd CRUSH map rule.  
-#ceph osd pool create myfast 32 32 onssd
+Create a new replicated pool called myfast with 32 placement groups that uses the onhdd CRUSH map rule.  
+#ceph osd pool create myfast 32 32 onhdd
 
 
 /!\ Verify that the placement groups for the pool called myfast are only using the OSDsbacked by SSD storage.
