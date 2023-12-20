@@ -71,4 +71,3 @@ $ ceph osd pool set ecpool1 allow_ec_overwrites true
 $ ceph osd pool delete ecpool1 ecpool1 --yes-i-really-really-mean-it
 
 $ ceph tell mon.* config set mon_allow_pool_delete false
-tet
