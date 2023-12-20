@@ -18,7 +18,7 @@
 check the list of hosts within the cluster.
 
 
-# ceph orch host ls
+# ceph orch ls
 
 /!\
 
@@ -35,31 +35,26 @@ Scheduled mgr update...
 
 ~]# ceph orch host add NODE_HOSTNAME NODE_IP
 
-ceph orch host add osd7.ceph.example.com 10.10.128.7
+ceph orch host add ceph-node2 192.168.122.102
+ceph orch host add ceph-node3 192.168.122.103
+ceph orch host add ceph-osd1 192.168.122.111
+ceph orch host add ceph-osd1 192.168.122.112
 
 3 add label to the hosts
 
+[root@monnode1 ~]# ceph orch host label add ceph-node2 mon
+[root@monnode1 ~]# ceph orch host label add ceph-node3 mon
+[root@monnode1 ~]# ceph orch host label add ceph-node2 mgr
 
-[root@monnode1 ~]# ceph orch host label add mon2.ceph.example.com mon
-[root@monnode1 ~]# ceph orch host label add mon3.ceph.example.com mon
-[root@monnode1 ~]# ceph orch host label add mon2.ceph.example.com mgr
-
-[root@monnode1 ~]# ceph orch host label add osd1.ceph.example.com osd
-[root@monnode1 ~]# ceph orch host label add osd2.ceph.example.com osd
-[root@monnode1 ~]# ceph orch host label add osd3.ceph.example.com osd
+[root@monnode1 ~]# ceph orch host label add ceph-osd1 osd
+[root@monnode1 ~]# ceph orch host label add ceph-osd2 osd
 [root@monnode1 ~]#
-
 
 4 - Verify the hosts added
 
-
 #ceph orch hosts ls
-
-
-
 
 5- Deploy MON and MGR deamon 
 
-
-# ceph orch apply mon --placement="3 mon1.ceph.example.com mon2.ceph.example.com mon3.ceph.example.com"
-# ceph orch apply mgr --placement="2 mon1.ceph.example.com mon2.ceph.example.com"
+# ceph orch apply mon --placement="3 ceph-node1 ceph-node2 ceph-node3"
+# ceph orch apply mgr --placement="2 ceph-node1 ceph-node2"
