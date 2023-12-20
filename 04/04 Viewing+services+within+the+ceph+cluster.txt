@@ -52,4 +52,4 @@ add a new psw
 
   firefox exception
 setting->Privacy & Security->Certificates->View certificates->Servers->Add Exception
-https://host.containers.internal:3000
+https://ceph-node1:3000
