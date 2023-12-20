@@ -40,7 +40,7 @@ B ------------------------  Edit crush Map -----------------
 
 # ceph osd crush add-bucket rack1 rack
 # ceph osd crush add-bucket rack2 rack
-# ceph osd crush add-bucket rack3 rack
+no # ceph osd crush add-bucket rack3 rack
 
 
 
@@ -49,11 +49,11 @@ B ------------------------  Edit crush Map -----------------
 
 # ceph osd crush move rack1 root=default
 # ceph osd crush move rack2 root=default
-# ceph osd crush move rack3 root=default
+no # ceph osd crush move rack3 root=default
 # ceph osd crush move osd1 rack=rack1
 # ceph osd crush move osd2 rack=rack2
-# ceph osd crush move osd3 rack=rack3
-# ceph osd crush move osd4 rack=rack3
+no # ceph osd crush move osd3 rack=rack3
+no # ceph osd crush move osd4 rack=rack3
 
 /]# ceph osd crush tree
 
