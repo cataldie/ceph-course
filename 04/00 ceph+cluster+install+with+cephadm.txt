@@ -1,7 +1,7 @@
 -------------------------------Deployment of a Ceph Cluster with Cephadm-------------------
 $ sudo nano /etc/ssh/sshd_config
 PermitRootLogin yes
-$ sudo restart sshd
+$ sudo systemctl restart sshd
 $ sudo passwd root
 
 1- Cephadm Deployment prerequisites
