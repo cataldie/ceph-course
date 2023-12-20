@@ -11,7 +11,8 @@ and services in a storage cluster.
 [root@node ~]# cephadm shell
 /]#
 
-
+$ exit
 To run a single command, use the cephadm shell command followed by two dashes and the
 Ceph command.
 ]# cephadm shell -- CEPH_COMMAND
+cephadm shell -- ceph -s

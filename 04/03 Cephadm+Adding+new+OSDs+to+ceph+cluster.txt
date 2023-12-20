@@ -17,7 +17,7 @@ The --wide option provides more device detail.
 # ceph orch device ls
 
 
- #ceph orch device ls --hostname=osd1.ceph.example.com
+ #ceph orch device ls --hostname=ceph-osd1
  
  2- ADD devices to cluster
  

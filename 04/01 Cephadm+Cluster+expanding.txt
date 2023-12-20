@@ -58,3 +58,6 @@ ceph orch host add ceph-osd2 192.168.122.112
 
 # ceph orch apply mon --placement="3 ceph-node1 ceph-node2 ceph-node3"
 # ceph orch apply mgr --placement="2 ceph-node1 ceph-node2"
+
+# check the new mons and mgr
+$ ceph -s 
