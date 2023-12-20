@@ -38,7 +38,7 @@ Scheduled mgr update...
 ceph orch host add ceph-node2 192.168.122.102
 ceph orch host add ceph-node3 192.168.122.103
 ceph orch host add ceph-osd1 192.168.122.111
-ceph orch host add ceph-osd1 192.168.122.112
+ceph orch host add ceph-osd2 192.168.122.112
 
 3 add label to the hosts
 

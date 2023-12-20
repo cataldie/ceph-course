@@ -43,7 +43,7 @@ $ sudo apt update
 $ apt-cache policy docker-ce
 $ sudo apt install -y  docker-ce
 $ sudo systemctl status docker
-$ sudo apt install -y podman
+//$ sudo apt install -y podman
 $ sudo apt install -y lvm2
 $ sudo apt install -y python3
 
