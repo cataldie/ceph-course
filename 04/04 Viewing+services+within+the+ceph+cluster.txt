@@ -37,3 +37,6 @@ e-Use the ceph osd status command to view the status of all OSDs.
 
 g-Use the ceph osd crush tree command to view the cluster CRUSH hierarchy.
  /]# ceph osd crush tree 
+
+ # DASHBOARD
+ $ ceph mgr services
