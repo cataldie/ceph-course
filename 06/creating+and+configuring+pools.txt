@@ -12,13 +12,63 @@ b-Verify that PG autoscaling is enabled for the replpool1 pool and that it is th
 
 /]# ceph config get mon osd_pool_default_pg_autoscale_mode
 on
+# check the pool list
+$ ceph osd lspools 
+# set the pool size
+$ ceph osd pool set replpool1 size 4
 
+$ ceph osd pool set replpool1 min_size 2
 
-ceph osd pool delete newpool newpool --yes-i-really-really-mean-it
-ceph osd pool delete newpool newpool --yes-i-really-really-mean-it
+$ ceph osd pool application enable replpool1 rbd
 
+$ ceph osd pool ls detail
 
+$ ceph osd pool get replpool1 size
 
-ceph osd pool create ecpool1 32 32 erasure ecprofile-k4-m2
+$ ceph osd pool rename replpool1 newpool
 
-ceph osd pool delete ecpool1 ecpool1 --yes-i-really-really-mean-it
+$ ceph osd pool delete newpool
+$ ceph osd pool delete newpool newpool --yes-i-really-really-mean-it
+
+$ ceph tell mon.* config set mon_allow_pool_delete true
+
+$ ceph osd pool delete newpool newpool --yes-i-really-really-mean-it
+
+$ ceph osd erasure-code-profile ls
+
+$ ceph osd erasure-code-profile get default
+
+$ ceph osd erasure-code-profile set 2default k=2 m=2
+
+$ ceph osd erasure-code-profile ls
+
+$ ceph osd pool create ecpool1 32 32 erasure 2default
+
+$ ceph osd pool application enable ecpool1 rgw
+
+$ ceph osd pool ls detail 
+
+# see the pg status on the dashboard pool and then
+
+$ ceph osd getcrushmap -o /tmp/crushmap.bin
+
+$ crushtool -d /tmp/crushmap.bin -o /tmp/crushmap.txt
+
+$ cp /tmp/crushmap.txt /tmp/crushmap-new.txt
+
+$ nano /tmp/crushmap-new.txt
+# change the ecpool1 rule from step chooseleaf indep 0 type host to
+step chooseleaf indep 0 type osd
+
+$ crushtool -c /tmp/crushmap-new.txt -o /tmp/crushmap-new.bin
+
+$ ceph osd setcrushmap -i /tmp/crushmap-new.bin 
+
+# go to the dashboard and refresh now it is ok
+
+$ ceph osd pool set ecpool1 allow_ec_overwrites true
+
+$ ceph osd pool delete ecpool1 ecpool1 --yes-i-really-really-mean-it
+
+$ ceph tell mon.* config set mon_allow_pool_delete false
+tet
