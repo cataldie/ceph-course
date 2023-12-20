@@ -19,9 +19,6 @@ a -Use the ceph health command to view the health of your Ceph cluster.
 b-Use the ceph status command to view the full cluster status.
 /]# ceph status
 
-ceph config set mon mon_data_avail_warn false
-
-
 4- Explore the Ceph cluster by viewing the cluster components.
 
 a-Use the ceph mon dump command to view the cluster MON map.
@@ -39,4 +36,4 @@ e-Use the ceph osd status command to view the status of all OSDs.
 /]# ceph osd status
 
 g-Use the ceph osd crush tree command to view the cluster CRUSH hierarchy.
- /]# 
+ /]# ceph osd crush tree 
