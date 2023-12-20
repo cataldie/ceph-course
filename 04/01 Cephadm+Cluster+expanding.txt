@@ -52,7 +52,7 @@ ceph orch host add ceph-osd2 192.168.122.112
 
 4 - Verify the hosts added
 
-#ceph orch hosts ls
+#ceph orch host ls
 
 5- Deploy MON and MGR deamon 
 
