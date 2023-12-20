@@ -1,0 +1,159 @@
+-------------------------------------CLUSTER B INSTALL ----------------------------
+
+1- Deployment prerequisites
+
+a- docker or podman
+Cephadm uses Docker or Podman to deploy Ceph daemons as containers.
+
+$sudo yum install -y yum-utils
+$sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+$sudo yum install docker-ce docker-ce-cli containerd.io -y --allowerasing
+$ sudo systemctl start docker && sudo  systemctl enable docker
+------------------
+sudo dnf update -y &&
+sudo dnf install dnf-plugins-core -y &&
+sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo &&
+sudo dnf config-manager --add-repo=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8_Stream/devel:kubic:libcontainers:stable.repo &&
+sudo dnf install podman -y &&
+podman version && 
+sudo dnf install -y python3 &&
+sudo yum -y install lvm2
+
+b- python3
+Cephadm is a Python-based tool, so you need to install Python3 before you can install it.
+
+
+$ sudo dnf install -y python3
+
+c- lvm2:
+Cephadm uses LVM to create and manage the storage for Ceph OSDs. LVM is a Logical Volume Manager, which allows you to create logical volumes from physical disks. 
+
+$ sudo yum -y install lvm2
+
+
+2- Cephadm install
+
+A-
+clone thne cephadm project
+
+# curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
+
+
+Make it executable
+
+# chmod +x cephadm
+
+Add the ceph pacific repo to the server
+
+# ./cephadm add-repo --release pacific 
+
+#./cephadm install
+
+
+Install the ceph-commun package ( ... ceph, rbd, ...)
+
+aoybt5hsxxaoybt5hsxx
+
+# cephadm install ceph-common
+
+B- Cluster bootstraping
+
+#cephadm bootstrap --mon-ip 10.10.128.19 --cluster-network 172.16.0.0/16 --allow-fqdn-hostname
+
+---------------- Cluster expending-------------------
+
+1- Passwordless connexion between cephadm orchestrator and other nodes.
+
+
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub s2osd1.ceph.example.com
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub s2osd2.ceph.example.com
+
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub s2osd3.ceph.example.com
+
+
+
+check the list of hosts within the cluster.
+
+
+# ceph orch host ls
+
+/!\
+
+To disable the Orchestrator from automatically provisioning MON or MGR deamon to any new host, set the unmanaged.
+
+[root@monnode1 ~]# ceph orch apply mon --unmanaged
+Scheduled mon update...
+[root@monnode1 ~]# ceph orch apply mgr --unmanaged
+Scheduled mgr update...
+[root@monnode1 ~]#
+
+
+2- Add a new host to the cluster
+
+~]# ceph orch host add NODE_HOSTNAME NODE_IP
+
+ceph orch host add s2osd1.ceph.example.com 10.10.128.20 &&
+ceph orch host add s2osd2.ceph.example.com 10.10.128.21 &&
+ceph orch host add s2osd3.ceph.example.com 10.10.128.22
+
+3 add label to the hosts
+
+
+[root@monnode1 ~]# ceph orch host label add mon2.ceph.example.com mon
+[root@monnode1 ~]# ceph orch host label add mon3.ceph.example.com mon
+[root@monnode1 ~]# ceph orch host label add mon2.ceph.example.com mgr
+
+[root@monnode1 ~]# ceph orch host label add s2osd1.ceph.example.com osd &&
+ceph orch host label add s2osd2.ceph.example.com osd &&
+ceph orch host label add s2osd3.ceph.example.com osd
+
+
+
+4 - Verify the hosts added
+
+
+#ceph orch hosts ls
+
+ 
+
+
+
+
+---------------------------- ADD OSDs to cluster-------------------
+Ceph requires that the following conditions are met to consider a storage device:
+
+• The device must not have any partitions.
+• The device must not have any LVM state.
+• The device must not be mounted.
+• The device must not contain a file system.
+• The device must not contain a Ceph BlueStore OSD.
+• The device must be larger than 5 GB
+
+
+Run the ceph orch device ls command from the cephadm shell to list the available devices.
+The --wide option provides more device detail.
+
+1-List the device
+
+# ceph orch device ls
+
+
+ #ceph orch device ls --hostname=osd1.ceph.example.com
+ 
+ 2- ADD devices to cluster
+ 
+ run the ceph orch apply osd --all-available-devices command to deploy OSDs on all available and unused devices.
+ 
+ # ceph orch apply osd --all-available-devices
+ 
+ This command creates an OSD service called osd.all-available-devices and enables the
+Orchestrator service to manage all OSD provisioning. The Orchestrator automatically creates
+OSDs from both new disk devices in the cluster.
+
+
+
+To disable the Orchestrator from automatically provisioning OSDs, set the unmanaged flag to true.
+
+# ceph orch apply osd --all-available-devices --unmanaged=true
