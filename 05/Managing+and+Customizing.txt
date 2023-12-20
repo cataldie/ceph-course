@@ -83,9 +83,6 @@ rule replicated_hybrid_rule {
      step take rack1 class hdd
      step chooseleaf firstn 0 type host
      step emit
-     step take rack2 class ssd
-     step chooseleaf firstn 0 type host
-     step emit
 }
 
 
@@ -99,9 +96,6 @@ and the remaining replicas use OSDs backed by HDD storage from different racks.
 d- Compile your new CRUSH map
 
 # crushtool -c /tmp/crushmap-new.txt -o /tmp/crushmap-new.bin
-crushtool -c /tmp/crushmap-new.txt -o /tmp/crushmap-new.bin
-
-
 
 e- Before applying the new map to the running cluster, use the crushtool command
 with the --show-mappings option to verify that the first OSD is always from rack1.
@@ -134,4 +128,4 @@ the ones from rack1.
 # ceph osd lspools
 
 
-]# ceph pg dump pgs_brief | grep ^6
+]# ceph pg dump pgs_brief | grep ^3
