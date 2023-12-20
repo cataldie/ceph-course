@@ -50,10 +50,10 @@ no # ceph osd crush add-bucket rack3 rack
 # ceph osd crush move rack1 root=default
 # ceph osd crush move rack2 root=default
 no # ceph osd crush move rack3 root=default
-# ceph osd crush move osd1 rack=rack1
-# ceph osd crush move osd2 rack=rack2
-no # ceph osd crush move osd3 rack=rack3
-no # ceph osd crush move osd4 rack=rack3
+# ceph osd crush move ceph-osd1 rack=rack1
+# ceph osd crush move ceph-osd2 rack=rack2
+no # ceph osd crush move ceph-osd3 rack=rack3
+no # ceph osd crush move ceph-osd4 rack=rack3
 
 /]# ceph osd crush tree
 
@@ -73,20 +73,17 @@ c- Save a copy of the CRUSH map as /tmp/crushmap-new.txt, and add the following 
 end of the file
 
 /]# cp /tmp/crushmap.txt /tmp/crushmap-new.txt
-/]# cat /tmp/crushmap-new.txt
+/]# nano /tmp/crushmap-new.txt
 
 rule replicated_hybrid_rule {
      id 3
      type replicated
      min_size 1
      max_size 3
-     step take rack1 class ssd
+     step take rack1 class hdd
      step chooseleaf firstn 0 type host
      step emit
-     step take rack2 class hdd
-     step chooseleaf firstn 0 type host
-     step emit
-     step take rack3 class hdd
+     step take rack2 class ssd
      step chooseleaf firstn 0 type host
      step emit
 }
