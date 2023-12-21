@@ -38,9 +38,10 @@ $ ceph auth get client.labpool1.client1
 
 1. On the client node (clientb), install the required Ceph packages:
 
-```bash
-yum install centos-release-ceph-pacific epel-release -y
-yum install ceph-common -y
+1. Install the required packages:
+```
+sudo apt update -y
+sudo apt install ceph-common -y
 ```
 
 root@ceph-client1:~# cd /etc/ceph/
@@ -52,7 +53,7 @@ root@ceph-node1:/# scp /etc/ceph/ceph.client.labpool1.client1.keyring root@ceph-
 
 
 2. Export CEPH_ARGS to specify the client's ID:
-
+try ceph df not permitted, then
 ```bash
 root@ceph-client1:~# export CEPH_ARGS='--id=labpool1.client1'
 ```
