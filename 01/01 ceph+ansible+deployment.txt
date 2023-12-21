@@ -23,6 +23,7 @@ Go to the ceph pacific branch.
 $ pip3 install wheel --user
 
 $export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+# You can skip the rust installation and other related dependencies by adding the line below before apk add commands:
 
 [cephuser@mon1 ceph-ansible]$  pip3 install --upgrade pip --user
 
