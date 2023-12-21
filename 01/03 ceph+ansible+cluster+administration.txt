@@ -88,6 +88,9 @@ Edit the file group_vars/all.yml and add containerized_deployment: true
 
 ansible-playbook -u cephuser site-container.yml -i hosts
 
+sudo apt install podman
+podman ps
+
 [cephuser@osd1 ~]$ lsblk
 NAME                                                                  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 ......
