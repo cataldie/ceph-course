@@ -19,6 +19,8 @@ ceph osd pool create labpool1 32 32
 ```bash
 rbd pool init labpool1
 ```
+check the usaget store
+$ ceph df
 
 3. Generate the necessary authentication credentials for the pool:
 
@@ -27,6 +29,10 @@ ceph auth get-or-create client.labpool1.client1 \
     mon 'profile rbd' osd 'profile rbd' \
     -o /etc/ceph/ceph.client.labpool1.client1.keyring
 ```
+
+$ more /etc/ceph/ceph.client.labpool1.client1.keyring
+
+$ ceph auth get client.labpool1.client1
 
 ## Step 2: Configure the Client Node
 
@@ -37,10 +43,18 @@ yum install centos-release-ceph-pacific epel-release -y
 yum install ceph-common -y
 ```
 
+root@ceph-client1:~# cd /etc/ceph/
+root@ceph-client1:/etc/ceph# ls
+rbdmap
+
+root@ceph-node1:/# scp /etc/ceph/ceph.conf root@ceph-client1:/etc/ceph
+root@ceph-node1:/# scp /etc/ceph/ceph.client.labpool1.client1.keyring root@ceph-client1:/etc/ceph
+
+
 2. Export CEPH_ARGS to specify the client's ID:
 
 ```bash
-export CEPH_ARGS='--id=labpool1.client1'
+root@ceph-client1:~# export CEPH_ARGS='--id=labpool1.client1'
 ```
 
 3. Verify the cluster connection:
@@ -48,6 +62,7 @@ export CEPH_ARGS='--id=labpool1.client1'
 ```bash
 rbd ls labpool1
 ```
+if no error is ok
 
 ## Step 3: Create and Mount RBD Images
 
@@ -56,6 +71,14 @@ rbd ls labpool1
 ```bash
 rbd create labpool1/test --size=128M
 ```
+
+```bash
+rbd ls labpool1
+```
+check the information of this image
+$ rbd info labpool1/test
+Now, this image has not yet mapped to my cluster.
+$ rbd showmapped
 
 2. Map the RBD image on the clientb node using the kernel RBD client:
 
@@ -74,6 +97,8 @@ rbd showmapped
 ```bash
 mkfs.xfs /dev/rbd0
 ```
+there is not the device
+df -h 
 
 5. Create a mount point:
 
@@ -87,6 +112,9 @@ mkdir /mnt/rbd
 mount /dev/rbd0 /mnt/rbd
 ```
 
+now there is the device
+df -h 
+
 7. Review the file system usage:
 
 ```bash
@@ -98,22 +126,33 @@ df /mnt/rbd
 ```bash
 dd if=/dev/zero of=/mnt/rbd/test1 bs=10M count=1
 ```
-
 9. Verify the content and file size:
 
 ```bash
-ls /mnt/rbd
-df /mnt/rbd
+cd /mnt/rbd
+ls 
+ll -h
+df
 ```
+$ cd
+check the client pool from the node note that we crated 10mb  of the data but the cluser see 35mb
+Just because this folder, this pulsar is a replicated pool and the default number of replica is three.
+root@ceph-node1:/# ceph df
+
 
 ## Step 4: Unmap and Configure Persistent Mounting
 
 1. Unmount the file system and unmap the RBD image:
 
 ```bash
-umount /mnt/rbd
+root@ceph-client1:~# umount /mnt/rbd
 rbd unmap /dev/rbd0
 ```
+
+root@ceph-client1:~# more /etc/ceph/rbdmap 
+# RbdDevice		Parameters
+#poolname/imagename	id=client,keyring=/etc/ceph/ceph.client.keyring
+
 
 2. Configure the client system to persistently mount the RBD image as "/mnt/rbd."
 
@@ -141,6 +180,9 @@ rbdmap map
 rbd showmapped
 ```
 
+rbdmap unmap
+rbd showmapped
+
 7. Enable the rbdmap service to ensure persistent mounting:
 
 ```bash
@@ -148,8 +190,19 @@ systemctl enable rbdmap
 ```
 
 8. Reboot the clientb node to verify that the RBD device mounts persistently.
+reboot now
+df -h # The device has been automatically mounted by the service.
+
+root@ceph-client1:~# df | grep rbd
+/dev/rbd0                            123584   18180    105404  15% /mnt/rbd
+root@ceph-client1:~# rbdmap  unmap
+root@ceph-client1:~# df | grep rbd
+df -h 
 
 ## Step 5: Clean Up
+comment o remove:
+"/dev/rbd/labpool1/test /mnt/rbd xfs noauto 0 0" >> /etc/fstab
+"labpool1/test id=labpool1.client1,keyring=/etc/ceph/ceph.client.labpool1.client1.keyring" >> /etc/ceph/rbdmap
 
 1. If needed, remove the RBD image:
 
@@ -162,5 +215,7 @@ rbd rm labpool1/test --id labpool1.client1
 ```bash
 rados -p labpool1 ls --id labpool1.client1
 ```
+root@ceph-node1:/# ceph df
+# and check that the labpool1 has no used space
 
 Please ensure to follow these instructions carefully to create and manage RADOS block devices effectively.
