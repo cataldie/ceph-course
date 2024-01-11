@@ -1,0 +1,58 @@
+lsblk
+##add new osd
+ceph orch daemon add osd ceph-osd3:/dev/vdh
+
+##remove osd
+#I will ask the cluster, am I able to safely remove visual or perform a out send out of the cluster?
+while ! ceph osd safe-to-destroy osd.OSD_ID; do sleep 10; done
+ceph osd out OSD_ID
+ceph orch osd rm OSD_ID
+
+## WARN WRONG  replacement procedure
+cephadm shell
+
+ceph osd tree | grep -i down
+
+ceph osd find osd.7
+
+#We have to disable the scrubbing within your cluster.
+ceph osd set noscrub
+ceph osd set nodeep-scrub
+
+ceph osd out 7
+
+#I will ask the cluster, am I able to safely remove visual or perform a out send out of the cluster?
+while ! ceph osd safe-to-destroy osd.7; do sleep 10; done
+
+#This command will permit you to destroy any data within any device within your cluster.
+ceph orch device zap HOST_NAME OSD_ID --force
+
+root@osd2: apt install ceph-osd
+
+root@osd2: ceph-volume lvm list
+get the device name
+
+# fail
+ceph orch device zap ceph-osd2 /dev/vdd --force
+
+#choice 1:That means that you will save will keep the ID seven and also keep the container seven or just waiting for the as we want to replace.
+ceph orch osd rm 7 --replace
+
+# fail again
+ceph orch device zap ceph-osd2 /dev/vdd --force
+
+# add a new drive to perform the replacement
+ceph orch daemon add osd ceph-osd2:/dev/vdh
+
+## CORRECT replacement procedure
+
+#I will ask the cluster, am I able to safely remove visual or perform a out send out of the cluster?
+while ! ceph osd safe-to-destroy osd.4; do sleep 10; done
+
+ceph orch osd rm 4 --replace
+
+check the osd status is "destoryed" in the dashboard or ceph osd tree
+
+ceph orch daemon add osd ceph-osd3:/dev/[new device]
+
+ceph orch device zap ceph-osd2 /dev/[old device] --force

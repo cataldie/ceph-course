@@ -30,6 +30,19 @@ Cephadm uses LVM to create and manage the storage for Ceph OSDs. LVM is a Logica
 
 $ sudo yum -y install lvm2
 
+nano /etc/hosts
+192.168.122.105 ceph-2node1
+192.168.122.106 ceph-2node2
+192.168.122.107 ceph-2node3
+192.168.122.115 ceph-2osd1
+192.168.122.116 ceph-2osd2
+
+  <host mac='52:54:00:c3:39:df' name='ceph-2node1' ip='192.168.122.105'/>
+  <host mac='52:54:00:c3:39:df' name='ceph-2node2' ip='192.168.122.106'/>
+  <host mac='52:54:00:c3:39:df' name='ceph-2node3' ip='192.168.122.107'/>
+  <host mac='52:54:00:c3:39:df' name='ceph-2osd1' ip='192.168.122.115'/>
+  <host mac='52:54:00:c3:39:df' name='ceph-2osd2' ip='192.168.122.116'/>
+
 
 2- Cephadm install
 
@@ -58,28 +71,21 @@ aoybt5hsxxaoybt5hsxx
 
 B- Cluster bootstraping
 
-#cephadm bootstrap --mon-ip 10.10.128.19 --cluster-network 172.16.0.0/16 --allow-fqdn-hostname
+#
 
 ---------------- Cluster expending-------------------
 
 1- Passwordless connexion between cephadm orchestrator and other nodes.
 
 
-
-#  ssh-copy-id -f -i /etc/ceph/ceph.pub s2osd1.ceph.example.com
-
-#  ssh-copy-id -f -i /etc/ceph/ceph.pub s2osd2.ceph.example.com
-
-#  ssh-copy-id -f -i /etc/ceph/ceph.pub s2osd3.ceph.example.com
-
-
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-2node2
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-2node3
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-2osd1
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-2osd2
 
 check the list of hosts within the cluster.
 
-
 # ceph orch host ls
-
-/!\
 
 To disable the Orchestrator from automatically provisioning MON or MGR deamon to any new host, set the unmanaged.
 
@@ -87,38 +93,26 @@ To disable the Orchestrator from automatically provisioning MON or MGR deamon to
 Scheduled mon update...
 [root@monnode1 ~]# ceph orch apply mgr --unmanaged
 Scheduled mgr update...
-[root@monnode1 ~]#
-
 
 2- Add a new host to the cluster
 
 ~]# ceph orch host add NODE_HOSTNAME NODE_IP
 
-ceph orch host add s2osd1.ceph.example.com 10.10.128.20 &&
-ceph orch host add s2osd2.ceph.example.com 10.10.128.21 &&
-ceph orch host add s2osd3.ceph.example.com 10.10.128.22
+ceph orch host add ceph-2osd1 192.168.122.115 &&
+ceph orch host add ceph-2osd2 192.168.122.116
 
 3 add label to the hosts
 
+[root@monnode1 ~]# ceph orch host label add ceph-2node2 mon
+[root@monnode1 ~]# ceph orch host label add ceph-2node3 mon
+[root@monnode1 ~]# ceph orch host label add ceph-2node2 mgr
 
-[root@monnode1 ~]# ceph orch host label add mon2.ceph.example.com mon
-[root@monnode1 ~]# ceph orch host label add mon3.ceph.example.com mon
-[root@monnode1 ~]# ceph orch host label add mon2.ceph.example.com mgr
-
-[root@monnode1 ~]# ceph orch host label add s2osd1.ceph.example.com osd &&
-ceph orch host label add s2osd2.ceph.example.com osd &&
-ceph orch host label add s2osd3.ceph.example.com osd
-
-
+[root@monnode1 ~]# ceph orch host label add ceph-2osd1 osd
+[root@monnode1 ~]# ceph orch host label add ceph-2osd2 osd
 
 4 - Verify the hosts added
 
-
-#ceph orch hosts ls
-
- 
-
-
+#ceph orch host ls
 
 
 ---------------------------- ADD OSDs to cluster-------------------
@@ -138,7 +132,6 @@ The --wide option provides more device detail.
 1-List the device
 
 # ceph orch device ls
-
 
  #ceph orch device ls --hostname=osd1.ceph.example.com
  

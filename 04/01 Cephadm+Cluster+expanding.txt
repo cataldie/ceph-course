@@ -1,3 +1,4 @@
+ceph orch host ls # controllare la lista degli host
 ---------------- Cluster expending-------------------
 
 1- Passwordless connexion between cephadm orchestrator and other nodes.
@@ -12,7 +13,7 @@
 
 #  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-osd2
 
-
+#  ssh-copy-id -f -i /etc/ceph/ceph.pub ceph-osd3
 
 
 check the list of hosts within the cluster.
@@ -39,6 +40,7 @@ ceph orch host add ceph-node2 192.168.122.102
 ceph orch host add ceph-node3 192.168.122.103
 ceph orch host add ceph-osd1 192.168.122.111
 ceph orch host add ceph-osd2 192.168.122.112
+ceph orch host add ceph-osd3 192.168.122.113
 
 3 add label to the hosts
 
@@ -48,7 +50,7 @@ ceph orch host add ceph-osd2 192.168.122.112
 
 [root@monnode1 ~]# ceph orch host label add ceph-osd1 osd
 [root@monnode1 ~]# ceph orch host label add ceph-osd2 osd
-[root@monnode1 ~]#
+[root@monnode1 ~]# ceph orch host label add ceph-osd3 osd
 
 4 - Verify the hosts added
 

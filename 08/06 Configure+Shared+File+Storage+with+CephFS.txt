@@ -12,7 +12,7 @@ This guide explains how to configure user access restrictions to different folde
 2. Mount CephFS using the kernel client:
 ```bash
 # mkdir /mnt/mycephfs
-# mount -t ceph mon1.ceph.example.com:/ /mnt/mycephfs -o name=admin
+# mount -t ceph ceph-node1:/ /mnt/mycephfs -o name=admin
 ```
 
 3. Create two directories within the mounted CephFS:
@@ -43,26 +43,39 @@ Unmount the CephFS file system after the test:
 # cephadm shell -- ceph fs status
 ```
 
+# cephadm shell --mount /etc/ceph/
+
 2. The size reported will be larger because CephFS replicates data across multiple Ceph nodes.
 
 ## Step 5: Configure User Access Restrictions
 
 1. Create a new user `userceph` with read access to the root folder and read and write permissions to `dir2` folder. Use `cephadm shell --mount` to copy the user keyring file to `/etc/ceph/` on mon1:
 ```bash
-# ceph fs authorize mycephfs client.userceph / r /dir2 rw
+# ceph fs authorize mycephfs client.userceph tcc/ r /dir2 rw
 # ceph auth get client.userceph -o /mnt/ceph.client.userceph.keyring
 ```
+exit
 
 2. Copy the `ceph.conf` and `ceph.client.userceph.keyring` files to the client node (`clientcent1`).
+[root@mon1 ceph] scp /etc/ceph/ceph.conf root@ceph-client1:/etc/ceph
+[root@mon1 ceph] scp /etc/ceph/ceph.client.userceph.keyring root@ceph-client1:/etc/ceph
 
+ssh ceph-client1
 ## Step 6: Mount CephFS with User Permissions
 
 Use the kernel client to mount the CephFS file system with the `userceph` user:
 ```bash
-# mount -t ceph mon1.ceph.example.com:/ /mnt/mycephfs -o name=userceph,fs=mycephfs
+mkdir /mnt/mycephfs
+#NO mount -t ceph 1:/ /mnt/mycephfs -o name=userceph,fs=mycephfs
+#mount.ceph ceph-node1:/ /mnt/mycephfs -o name=userceph,fs=mycephfs
+df -h
 ```
 
 Test the user permissions in different folders and files.
+
+ls /mnt/mycephfs
+touch /mnt/mycephfs/dir1/atestfile1
+touch /mnt/mycephfs/dir2/atestfile1
 
 ## Step 7: Unmount CephFS
 
@@ -71,14 +84,18 @@ Unmount the CephFS file system after testing:
 # umount /mnt/mycephfs
 ```
 
-## Step 8: Use Ceph-FUSE Client
+## Step 8: Use Ceph-FUSE Client, on client node
 
 Install the Ceph-FUSE package and mount the file system:
 ```bash
 # mkdir /mnt/mycephfuse
 # dnf -y install centos-release-ceph-pacific epel-release
 # dnf -y install ceph-fuse
+# sudo apt-get install -y ceph-fuse
+mkdir /mnt/mycephfuse
 # ceph-fuse -n client.userceph --client_fs mycephfs /mnt/mycephfuse
+df -h
+ls /mnt/mycephfuse
 ```
 
 ## Step 9: Unmount Ceph-FUSE

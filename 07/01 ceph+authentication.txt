@@ -47,16 +47,12 @@ access to the myapp pool:
 [ceph: root@node /]# ceph auth caps client.app1 mon 'allow r' \
 osd 'allow rw pool=myapp'
 
-The ceph auth caps command overwrites existing capabilities When using this command, you
-must specify the full set of capabilities for all daemons, not only those you want to modify. Define
-an empty string to remove all capabilities:
-[ceph: root@node /]# ceph auth caps client.app1 osd ''
-
 
 3-Deleting User Accounts
 The ceph auth del command deletes a user account:
 [ceph: root@node /]# ceph auth del client.app1
 
+[ceph: root@node /]# rm /etc/ceph/ceph.client.app1.keyring
 
 
 C- Restricting Access
@@ -66,20 +62,38 @@ creates the formyapp2 user and limits their access to read and write on the myap
 [ceph: root@node /]# ceph auth get-or-create client.formyapp2 \
 mon 'allow r' osd 'allow rw pool=myapp'
 
+#ceph auth get client.formyapp2
+
 If you do not specify a pool when you configure capabilities, then Ceph sets them on all existing
 pools.
 The cephx mechanism can restrict access to objects by other means:
 • By object name prefix. The following example restricts access to only those objects whose
 names start with pref in any pool.
+
 [ceph: root@node /]# ceph auth get-or-create client.formyapp3 \
 mon 'allow r' osd 'allow rw object_prefix pref'
+
+#ceph auth get client.formyapp3
+
 • By namespace. Implement namespaces to logically group objects within a pool. You can then
 restrict user accounts to objects belonging to a specific namespace:
 [ceph: root@node /]# ceph auth get-or-create client.designer \
 mon 'allow r' osd 'allow rw namespace=photos'
+
+#ceph auth get client.designer
+
 • By path. The Ceph File System (CephFS) utilizes this method to restrict access to specific
 directories. This example creates a new user account, webdesigner, that can access only the /
 webcontent directory and its contents:
+
+A Ceph file system requires at least two RADOS pools, one for data and one for metadata.
+
+$ ceph osd pool create cephfs_data
+$ ceph osd pool create cephfs_metadata
+$ ceph fs new cephfs cephfs_metadata cephfs_data
+$ ceph fs ls
+
+
 [ceph: root@node /]# ceph fs authorize cephfs client.webdesigner /webcontent rw
 [ceph: root@node /]# ceph auth get client.webdesigner
 exported keyring for client.webdesigner
@@ -88,15 +102,12 @@ exported keyring for client.webdesigner
  caps mds = "allow rw path=/webcontent"
  caps mon = "allow r"
  caps osd = "allow rw pool=cephfs_data"
+
+
 • By Monitor command. This method restricts administrators to a specific list of commands. The
 following example creates the operator1 user account and limits its access to two commands:
 [ceph: root@node /]# ceph auth get-or-create client.operator1 \
 mon 'allow r, allow command "auth get-or-create", allow command "auth list"'
 
-
-
-LAB: Configure two users for an application with the following capabilites. 
-The first user, client.docedit, stores and retrieves documents in the docs namespace of the replpool1 pool. 
-
-The second user, client.docget, only retrieves documents from the replpool1 pool.
-
+il cephfs che abbiamo appena creato causerebbe un errore nel cluster in quanto non configurato correttamente
+ceph fs rm cephfs --yes-i-really-mean-it

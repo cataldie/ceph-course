@@ -1,0 +1,19 @@
+#remove host form the cluster
+
+ceph orch ls
+ceph orch rm [hostname]
+
+ceph orch ls
+
+ceph -s
+
+ceph orch host ls
+
+# in the host shell
+podman ps
+
+ceph orch host rm [hostname]
+
+ceph orch host drain [hostname]
+
+ceph orch host rm [hostname]

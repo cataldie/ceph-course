@@ -42,13 +42,38 @@ $  sudo ufw allow 6800:7100/tcp
 # 
 sudo nano /etc/hosts
 
+127.0.1.1 [nome del nodo corrente al posto di vagrant]
+
 192.168.122.101 ceph-node1
 192.168.122.102 ceph-node2
 192.168.122.103 ceph-node3
 192.168.122.111 ceph-osd1
 192.168.122.112 ceph-osd2
-192.168.122.151 ceph-client1
+192.168.122.113 ceph-osd3
 
+192.168.122.151 ceph-client1
+192.168.122.121 ceph-mdsgan1
+192.168.122.122 ceph-mdsgan2
+
+192.168.122.131 ceph-rgwiscsi1
+192.168.122.132 ceph-rgwiscsi2
+192.168.122.133 ceph-haproxy01
+
+192.168.122.105 ceph-2node1
+192.168.122.106 ceph-2node2
+192.168.122.107 ceph-2node3
+192.168.122.115 ceph-2osd1
+192.168.122.116 ceph-2osd2
+
+
+sudo nano /etc/hostname
+[nome del nodo corrente  al posto di vagrant]
+
+
+$ sudo nano /etc/ssh/sshd_config
+PermitRootLogin yes
+$ sudo systemctl restart sshd
+$ sudo passwd root
 
 #change hostname
 hostname

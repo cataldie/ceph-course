@@ -1,3 +1,4 @@
+
 -------------------------------------Creating and Configuring Pools----------
 Replicated pool creation
 
@@ -34,6 +35,8 @@ $ ceph tell mon.* config set mon_allow_pool_delete true
 
 $ ceph osd pool delete newpool newpool --yes-i-really-really-mean-it
 
+# pool with erasure option for data protection
+
 $ ceph osd erasure-code-profile ls
 
 $ ceph osd erasure-code-profile get default
@@ -48,13 +51,13 @@ $ ceph osd pool application enable ecpool1 rgw
 
 $ ceph osd pool ls detail 
 
-# see the pg status on the dashboard pool and then
+# see the pg status on the dashboard pool and then giallo
 
 $ ceph osd getcrushmap -o /tmp/crushmap.bin
 
 $ crushtool -d /tmp/crushmap.bin -o /tmp/crushmap.txt
 
-$ cp /tmp/crushmap.txt /tmp/crushmap-new.txt
+$ cp /tmp/crushmap.txt /tmp/crushmap-new.txtsudo
 
 $ nano /tmp/crushmap-new.txt
 # change the ecpool1 rule from step chooseleaf indep 0 type host to

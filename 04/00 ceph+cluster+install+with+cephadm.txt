@@ -51,7 +51,7 @@ $ sudo apt install -y python3
 2- Cephadm install
 
 A-
-clone thne cephadm project
+clone the cephadm project
 
 # curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
 

@@ -44,6 +44,8 @@ sudo apt update -y
 sudo apt install ceph-common -y
 ```
 
+sudo su -
+
 root@ceph-client1:~# cd /etc/ceph/
 root@ceph-client1:/etc/ceph# ls
 rbdmap
@@ -55,6 +57,8 @@ root@ceph-node1:/# scp /etc/ceph/ceph.client.labpool1.client1.keyring root@ceph-
 2. Export CEPH_ARGS to specify the client's ID:
 try ceph df not permitted, then
 ```bash
+
+root@ceph-client1:~# rbd ls labpool1
 root@ceph-client1:~# export CEPH_ARGS='--id=labpool1.client1'
 ```
 
@@ -147,7 +151,7 @@ root@ceph-node1:/# ceph df
 
 ```bash
 root@ceph-client1:~# umount /mnt/rbd
-rbd unmap /dev/rbd0
+root@ceph-client1:~# rbd unmap /dev/rbd0
 ```
 
 root@ceph-client1:~# more /etc/ceph/rbdmap 
@@ -155,50 +159,6 @@ root@ceph-client1:~# more /etc/ceph/rbdmap
 #poolname/imagename	id=client,keyring=/etc/ceph/ceph.client.keyring
 
 
-2. Configure the client system to persistently mount the RBD image as "/mnt/rbd."
-
-3. Create an entry for "labpool1/test" in the RBD map file:
-
-```bash
-echo "labpool1/test id=labpool1.client1,keyring=/etc/ceph/ceph.client.labpool1.client1.keyring" >> /etc/ceph/rbdmap
-```
-
-4. Create an entry for "/dev/rbd/labpool1/test" in the "/etc/fstab" file:
-
-```bash
-echo "/dev/rbd/labpool1/test /mnt/rbd xfs noauto 0 0" >> /etc/fstab
-```
-
-5. Re-map the RBD device:
-
-```bash
-rbdmap map
-```
-
-6. Check the mapped devices:
-
-```bash
-rbd showmapped
-```
-
-rbdmap unmap
-rbd showmapped
-
-7. Enable the rbdmap service to ensure persistent mounting:
-
-```bash
-systemctl enable rbdmap
-```
-
-8. Reboot the clientb node to verify that the RBD device mounts persistently.
-reboot now
-df -h # The device has been automatically mounted by the service.
-
-root@ceph-client1:~# df | grep rbd
-/dev/rbd0                            123584   18180    105404  15% /mnt/rbd
-root@ceph-client1:~# rbdmap  unmap
-root@ceph-client1:~# df | grep rbd
-df -h 
 
 ## Step 5: Clean Up
 comment o remove:

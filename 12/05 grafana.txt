@@ -1,0 +1,49 @@
+# services templates
+
+/usr/share/ceph/mgr/cephadm/templates/services/
+
+[users]
+  default_theme = dark
+[auth.anonymous]
+  enabled = true
+  org_name = 'Main Org.'
+  org_role = 'Viewer'
+[server]
+  domain = 'bootstrap.storage.lab'
+  protocol = https
+  cert_file = /etc/grafana/certs/cert_file
+  cert_key = /etc/grafana/certs/cert_key
+  http_port = {{ http_port }}
+  http_addr = {{ http_addr }}
+[security]
+  admin_user = admin
+  admin_password = {{ initial_admin_password }}
+  cookie_secure = true
+  cookie_samesite = none
+  allow_embedding = true
+[live]
+  allowed_origins = *
+  
+  ceph config-key set mgr/cephadm/services/grafana/grafana.ini \
+  -i grafana.yml.j2
+[log]
+level = debug
+
+ceph orch reconfig grafana
+
+
+vi grafanapsw.yaml
+
+service_type: grafana
+spec:
+  initial_admin_password: Kxsandra202
+  
+  
+ceph orch apply -i grafanapsw.yaml
+ceph orch redeploy grafana
+
+
+https://docs.ceph.com/en/latest/monitoring/#performance-metrics
+https://docs.ceph.com/en/latest/monitoring/#osd-performance
+https://docs.ceph.com/en/latest/monitoring/#physical-disk-performance
+https://docs.ceph.com/en/latest/monitoring/#pool-metrics

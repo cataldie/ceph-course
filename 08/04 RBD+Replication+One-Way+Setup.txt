@@ -1,12 +1,13 @@
-## RBD Replication One-Way Setup
+## RBD Replication One-Way Setup 
 
 **Prerequisites:**
 - Both Clusters (Cluster A and Cluster B) should have a healthy status. Verify using `ceph status`.
 - Ceph packages should be installed on both clusters.
 
 ### Step 1: Pool Creation
+cephadm shell # to see the fsid
 
-**Cluster A:**
+**Cluster A:** ssh root@clusterA
 
 ```bash
 # Create the pool "rbdrep" with 32 placement groups and set the application type to "rbd"
@@ -15,7 +16,7 @@ ceph osd pool application enable rbdrep rbd
 rbd pool init -p rbdrep
 ```
 
-**Cluster B:**
+**Cluster B:**ssh root@clusterB
 
 ```bash
 # Create a pool with the same name "rbdrep" in the backup cluster
@@ -32,12 +33,15 @@ rbd pool init -p rbdrep
 # Create a test RBD image in "rbdrep" pool
 rbd create image1 --size 1024 --pool rbdrep --image-feature=exclusive-lock,journaling
 
+rbd -p rbdrep ls
+
 # Enable pool-mode mirroring on "rbdrep" pool
 rbd mirror pool enable rbdrep pool
 
 # Verify pool-mode mirroring is enabled
 rbd --image image1 info
 ```
+#test rbd --image image1 info -p rbdrep
 
 ### Step 3: Configure Mirroring on Cluster A
 
@@ -53,7 +57,8 @@ rbd mirror pool peer bootstrap create --site-name prod rbdrep > /mnt/bootstrap_t
 
 # Exit cephadm shell and copy the bootstrap token file to the backup storage cluster
 exit
-rsync -avP /root/mirror/bootstrap_token_prod s2mon1:/root/bootstrap_token_prod
+sudo apt install rsync # (cluster A e B)
+rsync -avP /root/mirror/bootstrap_token_prod ceph-2node1:/root/bootstrap_token_prod
 ```
 
 ### Step 4: Configure Mirroring on Cluster B
@@ -65,12 +70,14 @@ rsync -avP /root/mirror/bootstrap_token_prod s2mon1:/root/bootstrap_token_prod
 cephadm shell --mount /root/bootstrap_token_prod
 
 # Deploy rbd-mirror daemon on s2mon1 node
-ceph orch apply rbd-mirror --placement=s2mon1.ceph.example.com
+ceph orch apply rbd-mirror --placement=ceph-2node1
+
+ceph orch ls # there is the rbd-mirror
 
 # Import the bootstrap token for backup cluster (bup)
 rbd mirror pool peer bootstrap import --site-name bup --direction rx-only rbdrep /mnt/bootstrap_token_prod
 
-# Verify the presence of the RBD image
+# Verify the presence of the RBD image, attenzione non ha funzionato ma ha funzionato con rbd ls -p rbdrep
 rbd -p rbd ls
 ```
 
@@ -84,13 +91,14 @@ cephadm shell
 rbd mirror pool info rbdrep
 ```
 
+
 **Cluster B:**
 
 ```bash
 # Display the pool information and status in Cluster B
 cephadm shell
 rbd mirror pool info rbdrep
-rbd mirror pool status
+rbd mirror pool status -p rbdrep
 ```
 
 Ensure that you follow the steps carefully to set up one-way RBD replication between the two Ceph clusters effectively.

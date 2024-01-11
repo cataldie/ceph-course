@@ -1,0 +1,22 @@
+#restrat daemon and services with orchestartor
+
+cephadm shell
+
+ceph orch ls
+
+ceph orch ps
+
+ceph orch restart [service name]
+
+ceph orch ps | [part of the service name]
+
+on the service, to check the time 
+podman ps 
+
+in the osd host
+systemctl list-units --all 'ceph*'
+
+systemctl status [di un osd]
+
+in the mon host
+ceph orch daemon restart osd.[id]

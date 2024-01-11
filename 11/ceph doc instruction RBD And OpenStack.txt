@@ -1,0 +1,1 @@
+https://docs.ceph.com/en/latest/rbd/rbd-openstack/#:~:text=To%20use%20Ceph%20Block%20Devices,the%20OpenStack%2FCeph%20technology%20stack
